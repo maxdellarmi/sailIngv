@@ -1,0 +1,8 @@
+
+*.lnk
+.idea/webServers.xml
+.idea/sail-1.14.9.iml
+.idea/php.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/deployment.xml

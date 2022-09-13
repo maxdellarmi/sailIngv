@@ -1,0 +1,299 @@
+Attaching to example-app-laravel.test-1, example-app-mailhog-1, example-app-meilisearch-1, example-app-mysql-1, example-app-redis-1, example-app-selenium-1
+example-app-selenium-1      | 2022-06-07 16:03:46,829 INFO Included extra file "/etc/supervisor/conf.d/selenium.conf" during parsing
+example-app-selenium-1      | 2022-06-07 16:03:46,832 INFO supervisord started with pid 8
+example-app-mysql-1         | [Entrypoint] MySQL Docker Image 8.0.29-1.2.8-server
+example-app-mysql-1         | [Entrypoint] Initializing database
+example-app-mysql-1         | 2022-06-07T16:03:47.480329Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.0.29) initializing of server in progress as process 16
+example-app-mysql-1         | 2022-06-07T16:03:47.496036Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+example-app-meilisearch-1   | [2022-06-07T16:03:47Z WARN  rustls::check] Received a ServerHelloDone handshake message while expecting [CertificateRequest]
+example-app-mailhog-1       | 2022/06/07 16:03:47 Using in-memory storage
+example-app-mailhog-1       | 2022/06/07 16:03:47 [SMTP] Binding to address: 0.0.0.0:1025
+example-app-mailhog-1       | 2022/06/07 16:03:47 Serving under http://0.0.0.0:8025/
+example-app-mailhog-1       | [HTTP] Binding to address: 0.0.0.0:8025
+example-app-mailhog-1       | Creating API v1 with WebPath:
+example-app-mailhog-1       | Creating API v2 with WebPath:
+example-app-selenium-1      | 2022-06-07 16:03:47,834 INFO spawned: 'xvfb' with pid 10
+example-app-selenium-1      | 2022-06-07 16:03:47,838 INFO spawned: 'vnc' with pid 11
+example-app-selenium-1      | 2022-06-07 16:03:47,848 INFO spawned: 'novnc' with pid 12
+example-app-selenium-1      | 2022-06-07 16:03:47,853 INFO spawned: 'selenium-standalone' with pid 13
+example-app-selenium-1      | Setting up SE_NODE_GRID_URL...
+example-app-selenium-1      | 2022-06-07 16:03:47,902 INFO success: xvfb entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+example-app-selenium-1      | 2022-06-07 16:03:47,903 INFO success: vnc entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+example-app-selenium-1      | 2022-06-07 16:03:47,905 INFO success: novnc entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+example-app-selenium-1      | 2022-06-07 16:03:47,905 INFO success: selenium-standalone entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+example-app-redis-1         | 1:C 07 Jun 2022 16:03:47.944 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+example-app-redis-1         | 1:C 07 Jun 2022 16:03:47.944 # Redis version=7.0.0, bits=64, commit=00000000, modified=0, pid=1, just started
+example-app-redis-1         | 1:C 07 Jun 2022 16:03:47.944 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+example-app-redis-1         | 1:M 07 Jun 2022 16:03:47.945 * monotonic clock: POSIX clock_gettime
+example-app-redis-1         | 1:M 07 Jun 2022 16:03:47.946 * Running mode=standalone, port=6379.
+example-app-redis-1         | 1:M 07 Jun 2022 16:03:47.947 # Server initialized
+example-app-redis-1         | 1:M 07 Jun 2022 16:03:47.947 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+example-app-redis-1         | 1:M 07 Jun 2022 16:03:47.947 * The AOF directory appendonlydir doesn't exist
+example-app-redis-1         | 1:M 07 Jun 2022 16:03:47.947 * Ready to accept connections
+example-app-selenium-1      | Selenium Grid Standalone configuration:
+example-app-selenium-1      | [network]
+example-app-selenium-1      | relax-checks = true
+example-app-selenium-1      |
+example-app-selenium-1      | [node]
+example-app-selenium-1      | session-timeout = "300"
+example-app-selenium-1      | override-max-sessions = false
+example-app-selenium-1      | detect-drivers = false
+example-app-selenium-1      | drain-after-session-count = 0
+example-app-selenium-1      | max-sessions = 1
+example-app-selenium-1      |
+example-app-selenium-1      | [[node.driver-configuration]]
+example-app-selenium-1      | display-name = "chrome"
+example-app-selenium-1      | stereotype = '{"browserName": "chrome", "browserVersion": "102.0", "platformName": "Linux"}'
+example-app-selenium-1      | max-sessions = 1
+example-app-selenium-1      |
+example-app-selenium-1      | Starting Selenium Grid Standalone...
+example-app-meilisearch-1   |
+example-app-meilisearch-1   | 888b     d888          d8b 888 d8b                                            888
+example-app-meilisearch-1   | 8888b   d8888          Y8P 888 Y8P                                            888
+example-app-meilisearch-1   | 88888b.d88888              888                                                888
+example-app-meilisearch-1   | 888Y88888P888  .d88b.  888 888 888 .d8888b   .d88b.   8888b.  888d888 .d8888b 88888b.
+example-app-meilisearch-1   | 888 Y888P 888 d8P  Y8b 888 888 888 88K      d8P  Y8b     "88b 888P"  d88P"    888 "88b
+example-app-meilisearch-1   | 888  Y8P  888 88888888 888 888 888 "Y8888b. 88888888 .d888888 888    888      888  888
+example-app-meilisearch-1   | 888   "   888 Y8b.     888 888 888      X88 Y8b.     888  888 888    Y88b.    888  888
+example-app-meilisearch-1   | 888       888  "Y8888  888 888 888  88888P'  "Y8888  "Y888888 888     "Y8888P 888  888
+example-app-meilisearch-1   |
+example-app-meilisearch-1   | Database path:            "./data.ms"
+example-app-meilisearch-1   | Server listening on:      "http://0.0.0.0:7700"
+example-app-meilisearch-1   | Environment:              "development"
+example-app-meilisearch-1   | Commit SHA:               "unknown"
+example-app-meilisearch-1   | Commit date:              "unknown"
+example-app-meilisearch-1   | Package version:  "0.27.1"
+example-app-meilisearch-1   |
+example-app-meilisearch-1   | Thank you for using Meilisearch!
+example-app-meilisearch-1   |
+example-app-meilisearch-1   | We collect anonymized analytics to improve our product and your experience. To learn more, including how to turn off analytics, visit our dedicated documentation page: https://docs.meilisearch.com/learn/what_is_meilisearch/telemetry.html
+example-app-meilisearch-1   |
+example-app-meilisearch-1   | Anonymous telemetry:      "Enabled"
+example-app-meilisearch-1   | Instance UID:             "3c7a695e-ce04-4c2b-8c13-30a18d3adb6a"
+example-app-meilisearch-1   |
+example-app-meilisearch-1   | No master key found; The server will accept unidentified requests. If you need some protection in development mode, please export a key: export MEILI_MASTER_KEY=xxx
+example-app-meilisearch-1   |
+example-app-meilisearch-1   | Documentation:            https://docs.meilisearch.com
+example-app-meilisearch-1   | Source code:              https://github.com/meilisearch/meilisearch
+example-app-meilisearch-1   | Contact:          https://docs.meilisearch.com/resources/contact.html
+example-app-meilisearch-1   |
+example-app-meilisearch-1   | [2022-06-07T16:03:48Z INFO  actix_server::builder] Starting 4 workers
+example-app-meilisearch-1   | [2022-06-07T16:03:48Z INFO  actix_server::server] Actix runtime found; starting in Actix runtime
+example-app-selenium-1      | 16:03:48.793 INFO [LoggingOptions.configureLogEncoding] - Using the system default encoding
+example-app-selenium-1      | 16:03:48.802 INFO [OpenTelemetryTracer.createTracer] - Using OpenTelemetry for tracing
+example-app-mysql-1         | 2022-06-07T16:03:48.872841Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+example-app-laravel.test-1  | 2022-06-07 16:03:49,947 INFO Set uid to user 0 succeeded
+example-app-laravel.test-1  | 2022-06-07 16:03:49,951 INFO supervisord started with pid 1
+example-app-selenium-1      | 16:03:50.097 INFO [NodeOptions.getSessionFactories] - Detected 4 available processors
+example-app-selenium-1      | 16:03:50.184 INFO [NodeOptions.report] - Adding chrome for {"browserVersion": "102.0","se:noVncPort": 7900,"browserName": "chrome","platformName": "LINUX","se:vncEnabled": true} 1 times
+example-app-selenium-1      | 16:03:50.209 INFO [Node.<init>] - Binding additional locator mechanisms: name, relative, id
+example-app-selenium-1      | 16:03:50.310 INFO [GridModel.setAvailability] - Switching Node eef5d81d-daf7-45f1-ba47-1c80fd95dc23 (uri: http://172.19.0.2:4444) from DOWN to UP
+example-app-selenium-1      | 16:03:50.310 INFO [LocalDistributor.add] - Added node eef5d81d-daf7-45f1-ba47-1c80fd95dc23 at http://172.19.0.2:4444. Health check every 120s
+example-app-selenium-1      | 16:03:50.746 INFO [Standalone.execute] - Started Selenium Standalone 4.2.1 (revision ac4d0fdd4a): http://172.19.0.2:4444
+example-app-laravel.test-1  | 2022-06-07 16:03:50,953 INFO spawned: 'php' with pid 16
+example-app-laravel.test-1  | 2022-06-07 16:03:51,958 INFO success: php entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+example-app-mysql-1         | 2022-06-07T16:03:53.181535Z 6 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+example-app-laravel.test-1  | Starting Laravel development server: http://0.0.0.0:80
+example-app-laravel.test-1  | [Tue Jun  7 16:03:56 2022] PHP 8.1.6 Development Server (http://0.0.0.0:80) started
+example-app-mysql-1         | [Entrypoint] Database initialized
+example-app-mysql-1         | 2022-06-07T16:03:58.780845Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.29) starting as process 63
+example-app-mysql-1         | 2022-06-07T16:03:58.802830Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+example-app-mysql-1         | 2022-06-07T16:03:59.010063Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+example-app-mysql-1         | 2022-06-07T16:03:59.451409Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+example-app-mysql-1         | 2022-06-07T16:03:59.451491Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+example-app-mysql-1         | 2022-06-07T16:03:59.481151Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: /var/run/mysqld/mysqlx.sock
+example-app-mysql-1         | 2022-06-07T16:03:59.481367Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.29'  socket: '/var/lib/mysql/mysql.sock'  port: 0  MySQL Community Server - GPL.
+example-app-mysql-1         | Warning: Unable to load '/usr/share/zoneinfo/iso3166.tab' as time zone. Skipping it.
+example-app-mysql-1         | Warning: Unable to load '/usr/share/zoneinfo/leapseconds' as time zone. Skipping it.
+example-app-mysql-1         | Warning: Unable to load '/usr/share/zoneinfo/tzdata.zi' as time zone. Skipping it.
+example-app-mysql-1         | Warning: Unable to load '/usr/share/zoneinfo/zone.tab' as time zone. Skipping it.
+example-app-mysql-1         | Warning: Unable to load '/usr/share/zoneinfo/zone1970.tab' as time zone. Skipping it.
+example-app-mysql-1         |
+example-app-mysql-1         | [Entrypoint] running /docker-entrypoint-initdb.d/10-create-testing-database.sh
+example-app-mysql-1         | /docker-entrypoint-initdb.d/10-create-testing-database.sh: line 3: testing%: command not found
+example-app-mysql-1         | mysql: [Warning] Using a password on the command line interface can be insecure.
+example-app-mysql-1         | ERROR 1064 (42000) at line 2: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.* TO 'sail'@'%'' at line 1
+example-app-mysql-1 exited with code 1
+example-app-meilisearch-1   | [2022-06-07T16:04:17Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000101
+example-app-meilisearch-1   | [2022-06-07T16:04:47Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000145
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:05:17Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000128
+example-app-meilisearch-1   | [2022-06-07T16:05:47Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000128
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:06:17Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000118
+example-app-laravel.test-1  | [Tue Jun  7 16:06:30 2022] 172.19.0.1:34280 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:06:30 2022] 172.19.0.1:34282 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:06:33 2022] 172.19.0.1:34280 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:06:34 2022] 172.19.0.1:34282 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:06:41 2022] 172.19.0.1:34286 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:06:43 2022] 172.19.0.1:34286 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:06:43 2022] 172.19.0.1:34288 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:06:43 2022] 172.19.0.1:34288 Closing
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:06:48Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000099
+example-app-meilisearch-1   | [2022-06-07T16:07:18Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000092
+example-app-laravel.test-1  | [Tue Jun  7 16:07:38 2022] 172.19.0.1:34298 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:07:40 2022] 172.19.0.1:34298 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:07:40 2022] 172.19.0.1:34300 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:07:40 2022] 172.19.0.1:34302 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:07:40 2022] 172.19.0.1:34300 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:07:40 2022] 172.19.0.1:34302 Closing
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:07:48Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000093
+example-app-mysql-1         | [Entrypoint] Starting MySQL 8.0.29-1.2.8-server
+example-app-mysql-1         | 2022-06-07T16:07:59.884501Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.29) starting as process 1
+example-app-mysql-1         | 2022-06-07T16:07:59.902224Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+example-app-mysql-1         | 2022-06-07T16:08:03.883142Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+example-app-mysql-1         | 2022-06-07T16:08:04.243027Z 0 [System] [MY-010229] [Server] Starting XA crash recovery...
+example-app-mysql-1         | 2022-06-07T16:08:04.252678Z 0 [System] [MY-010232] [Server] XA crash recovery finished.
+example-app-mysql-1         | 2022-06-07T16:08:04.291879Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+example-app-mysql-1         | 2022-06-07T16:08:04.291965Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+example-app-mysql-1         | 2022-06-07T16:08:04.292456Z 0 [ERROR] [MY-010259] [Server] Another process with pid 65 is using unix socket file.
+example-app-mysql-1         | 2022-06-07T16:08:04.292511Z 0 [ERROR] [MY-010268] [Server] Unable to setup unix socket lock file.
+example-app-mysql-1         | 2022-06-07T16:08:04.292831Z 0 [ERROR] [MY-010119] [Server] Aborting
+example-app-mysql-1         | 2022-06-07T16:08:05.865375Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.29)  MySQL Community Server - GPL.
+example-app-mysql-1 exited with code 1
+example-app-mysql-1         | [Entrypoint] Starting MySQL 8.0.29-1.2.8-server
+example-app-mysql-1         | 2022-06-07T16:08:09.829010Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.29) starting as process 1
+example-app-mysql-1         | 2022-06-07T16:08:09.851134Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+example-app-mysql-1         | 2022-06-07T16:08:10.134076Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+example-app-mysql-1         | 2022-06-07T16:08:10.491309Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+example-app-mysql-1         | 2022-06-07T16:08:10.491398Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+example-app-mysql-1         | 2022-06-07T16:08:10.540367Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+example-app-mysql-1         | 2022-06-07T16:08:10.540530Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.29'  socket: '/var/lib/mysql/mysql.sock'  port: 3306  MySQL Community Server - GPL.
+example-app-meilisearch-1   | [2022-06-07T16:08:18Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000102
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:08:48Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000104
+example-app-meilisearch-1   | [2022-06-07T16:09:18Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000105
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:09:48Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000105
+example-app-meilisearch-1   | [2022-06-07T16:10:18Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000063
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:10:49Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000077
+curl -s https://laravel.build/example-app | bashexample-app-meilisearch-1   | [2022-06-07T16:11:19Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000069
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:11:49Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000068
+example-app-laravel.test-1  | [Tue Jun  7 16:11:57 2022] 172.19.0.1:34340 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:12:00 2022] 172.19.0.1:34340 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:12:01 2022] 172.19.0.1:34344 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:12:03 2022] 172.19.0.1:34344 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:12:03 2022] 172.19.0.1:34348 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:12:03 2022] 172.19.0.1:34348 [200]: GET /favicon.ico
+example-app-laravel.test-1  | [Tue Jun  7 16:12:03 2022] 172.19.0.1:34348 Closing
+example-app-meilisearch-1   | [2022-06-07T16:12:19Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000130
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:12:49Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000062
+example-app-laravel.test-1  | [Tue Jun  7 16:12:49 2022] 172.19.0.1:34358 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:12:49 2022] 172.19.0.1:34358 [200]: GET /favicon.ico
+example-app-laravel.test-1  | [Tue Jun  7 16:12:49 2022] 172.19.0.1:34358 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:12:55 2022] 172.19.0.1:34364 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:12:57 2022] 172.19.0.1:34364 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:12:57 2022] 172.19.0.1:34368 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:12:57 2022] 172.19.0.1:34368 [200]: GET /favicon.ico
+example-app-laravel.test-1  | [Tue Jun  7 16:12:57 2022] 172.19.0.1:34368 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:13:04 2022] 172.19.0.1:34380 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:13:05 2022] 172.19.0.1:34380 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:13:05 2022] 172.19.0.1:34384 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:13:05 2022] 172.19.0.1:34384 [200]: GET /favicon.ico
+example-app-laravel.test-1  | [Tue Jun  7 16:13:05 2022] 172.19.0.1:34384 Closing
+example-app-meilisearch-1   | [2022-06-07T16:13:19Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000078
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:13:49Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000068
+example-app-meilisearch-1   | [2022-06-07T16:14:20Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000067
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:14:50Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000092
+example-app-meilisearch-1   | [2022-06-07T16:15:20Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000075
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:15:50Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000075
+example-app-meilisearch-1   | [2022-06-07T16:16:20Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000085
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:16:50Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000079
+curl -s https://laravel.build/example-app | bashexample-app-meilisearch-1   | [2022-06-07T16:17:20Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000123
+example-app-laravel.test-1  | [Tue Jun  7 16:17:40 2022] 172.19.0.1:34428 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:17:43 2022] 172.19.0.1:34428 Closing
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:17:51Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000070
+example-app-meilisearch-1   | [2022-06-07T16:18:21Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000063
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:18:51Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000074
+example-app-laravel.test-1  | [Tue Jun  7 16:19:00 2022] 172.19.0.1:34444 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:19:01 2022] 172.19.0.1:34444 Closing
+example-app-laravel.test-1  | [Tue Jun  7 16:19:02 2022] 172.19.0.1:34448 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:19:02 2022] 172.19.0.1:34448 [200]: GET /favicon.ico
+example-app-laravel.test-1  | [Tue Jun  7 16:19:02 2022] 172.19.0.1:34448 Closing
+example-app-meilisearch-1   | [2022-06-07T16:19:21Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000074
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:19:51Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000065
+example-app-meilisearch-1   | [2022-06-07T16:20:21Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000092
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:20:51Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000067
+example-app-meilisearch-1   | [2022-06-07T16:21:21Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000073
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:21:52Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000082
+example-app-meilisearch-1   | [2022-06-07T16:22:22Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000074
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:22:52Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000137
+example-app-meilisearch-1   | [2022-06-07T16:23:22Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000061
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:23:52Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000063
+example-app-meilisearch-1   | [2022-06-07T16:24:22Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000088
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:24:52Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000062
+example-app-meilisearch-1   | [2022-06-07T16:25:23Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000075
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:25:53Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000102
+example-app-meilisearch-1   | [2022-06-07T16:26:23Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000092
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:26:53Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000065
+example-app-meilisearch-1   | [2022-06-07T16:27:23Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000075
+example-app-laravel.test-1  | [Tue Jun  7 16:27:43 2022] 172.19.0.1:34518 Accepted
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-laravel.test-1  | [Tue Jun  7 16:27:48 2022] 172.19.0.1:34518 Closing
+example-app-meilisearch-1   | [2022-06-07T16:27:53Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000072
+example-app-meilisearch-1   | [2022-06-07T16:28:23Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000130
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:28:53Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000072
+example-app-meilisearch-1   | [2022-06-07T16:29:24Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000066
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:29:54Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000084
+example-app-meilisearch-1   | [2022-06-07T16:30:24Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000062
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:30:54Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000090
+example-app-meilisearch-1   | [2022-06-07T16:31:24Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000075
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:31:54Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000071
+example-app-meilisearch-1   | [2022-06-07T16:32:24Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000081
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:32:54Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000078
+example-app-meilisearch-1   | [2022-06-07T16:33:25Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000066
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:33:55Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000122
+example-app-meilisearch-1   | [2022-06-07T16:34:25Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000064
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:34:55Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000076
+example-app-meilisearch-1   | [2022-06-07T16:35:25Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000076
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:35:55Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000066
+example-app-meilisearch-1   | [2022-06-07T16:36:25Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000081
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:36:56Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000087
+example-app-meilisearch-1   | [2022-06-07T16:37:26Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000115
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-laravel.test-1  | [Tue Jun  7 16:37:48 2022] 172.19.0.1:34600 Accepted
+example-app-laravel.test-1  | [Tue Jun  7 16:37:52 2022] 172.19.0.1:34600 Closing
+example-app-meilisearch-1   | [2022-06-07T16:37:56Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000071
+example-app-meilisearch-1   | [2022-06-07T16:38:26Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000063
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:38:56Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000078
+example-app-meilisearch-1   | [2022-06-07T16:39:26Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000061
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:39:56Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000063
+example-app-meilisearch-1   | [2022-06-07T16:40:27Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000135
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:40:57Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000079
+example-app-meilisearch-1   | [2022-06-07T16:41:27Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000069
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:41:57Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000101
+example-app-meilisearch-1   | [2022-06-07T16:42:27Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000063
+example-app-mailhog-1       | [APIv1] KEEPALIVE /api/v1/events
+example-app-meilisearch-1   | [2022-06-07T16:42:57Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health HTTP/1.1" 200 22 "-" "Wget" 0.000068

@@ -388,33 +388,33 @@ function zoomHandlingWMSLAYERSStrum() {
     });
 }
 
-
-function clusteringObjectWithFirstElementStyle (feature) {
-    console.log("clusteringObjectWithFirstElementStyle");
-    var size = feature.get('features').length;
-    if (size === 1) {
-        return feature.get('features')[0].getStyle();
-    } else if (feature.get('features') !== undefined) {
-        return feature.get('features')[0].getStyle();
-    }
-}
-
-//************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
+//
 // function clusteringObjectWithFirstElementStyle (feature) {
 //     console.log("clusteringObjectWithFirstElementStyle");
 //     var size = feature.get('features').length;
 //     if (size === 1) {
-//         console.log(feature.get('features')[0]);
-//         console.log(feature.get('features')[0].values_OnClickTextIT);
-//         console.log(feature.get('features')[0].values_.Style);
-//         return feature.get('features')[0].values_.Style;
+//         return feature.get('features')[0].getStyle();
 //     } else if (feature.get('features') !== undefined) {
-//         console.log(feature.get('features')[0]);
-//         console.log(feature.get('features')[0].values_OnClickTextIT);
-//         console.log(feature.get('features')[0].values_.Style);
-//         feature.get('features')[0].values_.Style;
+//         return feature.get('features')[0].getStyle();
 //     }
 // }
+
+//************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
+function clusteringObjectWithFirstElementStyle (feature) {
+    console.log("clusteringObjectWithFirstElementStyle");
+    var size = feature.get('features').length;
+    if (size === 1) {
+        // console.log(feature.get('features')[0]);
+        // console.log(feature.get('features')[0].values_OnClickTextIT);
+        // console.log(feature.get('features')[0].values_.Style);
+        return feature.get('features')[0].values_.Style;
+    } else if (feature.get('features') !== undefined) {
+        // console.log(feature.get('features')[0]);
+        // console.log(feature.get('features')[0].values_OnClickTextIT);
+        // console.log(feature.get('features')[0].values_.Style);
+        feature.get('features')[0].values_.Style;
+    }
+}
 //************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
 
 
@@ -591,9 +591,6 @@ function creazioneMappa () {
                 title: 'BASEMAP'
             });
             console.log('caricati i terremoti test')
-            // for (var i = 0; i < markersArray.length; i++) { //inizializzato nel js index.js
-            //     markers.push(markersArray[i]['Marker']);    //markers inizializzato in questo file.
-            // }
             console.log("carico i markers");
             /***
              * NOTA. Il primo caricamento va sempre a vuoto perche' non sono ancora stati caricati i filtri viene caricato correttamente dopo la funzione showQuakes.
@@ -601,16 +598,12 @@ function creazioneMappa () {
             /**********************oggetti feature contenenti le coordinate****************/
 
 //************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
-//             var source = new ol.source.Vector ({
-//                 features: new ol.format.GeoJSON().readFeatures(geoJSONArray),
-//                 projection: 'EPSG:3857'
-//             });
-//************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
-
             var source = new ol.source.Vector ({
-                features: filteredMarkersArray,
+                features: new ol.format.GeoJSON().readFeatures(geoJSONArray),
                 projection: 'EPSG:3857'
             });
+//************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
+
 
             /*il criterio di raggruppamento cluster */
             var clusterSource = new ol.source.Cluster({
@@ -737,7 +730,7 @@ function creazioneMappa () {
                             //geoJSON
                             if ( feature.get('features')[0].values_ != undefined ) {
                                 //evento click sull'elemento selezionato per evidenziare sulla tabella di sinistra
-                                console.log(feature.get('features')[0].values_);
+                                //console.log(feature.get('features')[0].values_);
                                 google.maps.event.trigger(geoJSONArray.features[feature.get('features')[0].values_.id] , 'click');
                             }
                         }
@@ -762,7 +755,7 @@ function creazioneMappa () {
                     }
                     //geoJSON
                     if ( featureId != undefined && geoJSONArray[featureId]!=undefined) {
-                        console.log(feature.get('features')[0].values_);
+                        //console.log(feature.get('features')[0].values_);
                         google.maps.event.trigger(geoJSONArray.features[featureId] , 'click');
                     }
 

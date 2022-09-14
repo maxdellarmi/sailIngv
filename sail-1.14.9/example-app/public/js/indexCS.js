@@ -26,10 +26,21 @@ var markersArray = [];
 var filteredMarkersArray = [];
 
 
+
+//************************************TODO:GESTIONE DESERIALIZZAZIONE+GEOJSON***********************************************************//
 //inizializzazione geoJSONArray
 var geoJSONArray={ "type": "FeatureCollection",
     "features": [ ]
 };
+//senza eventi click serializzabile!!! gli eventi del OpenPopupSpider vanno riassegnati di volta in volta
+var geoJSONArraySerializable= { "type": "FeatureCollection",
+    "features": [ ]
+};
+
+var quakesDataArray={ "elements": [ ]
+};
+
+
 
 var markersArrayEE = [];
 
@@ -468,51 +479,17 @@ var GmapsTools = function(){
                 //newtest
                 var cerchio = `<svg viewBox="0 0 250 250"   {height} {width} xmlns="http://www.w3.org/2000/svg" version="1.1"><circle cx="50" cy="50" r="40" {stroke} {widthS} {fill} /></svg>`;
                 var stella = `<svg viewBox="0 0 250 250" {height} {width} xmlns="http://www.w3.org/2000/svg" version="1.1"><path d="M 125,5 155,90 245,90 175,145 200,230 125,180 50,230 75,145 5,90 95,90 z" {fill} {stroke} {widthS} /></svg>`;
-
-                //stroke="{strokeColor}" stroke-width="{strokeWeight}" fill="{fillColor}
-                //{stroke} {stroke-width} {fill}
-                /*
-                                strokeColor diventa --->>>  stroke="#00000"
-                                strokeWeight diventa --->>  stroke-width="3"
-                                fillColor diventa ----->>>   fill="white"
-                                opacity e scale vanno sull'ICON
-
-                */
                 var compiled;
-                var coords = [];
-                // coords.push(Lon);//parseFloat(Lon).toFixed(5));
-                // coords.push(Lat);//parseFloat(Lat).toFixed(5));
 
-                //4326 is just the EPSG identifier of WGS84.
-                /* target: 'map',
-                  view: new View({
-                    projection: 'EPSG:3857', //HERE IS THE VIEW PROJECTION
-                    center: [0, 0],
-                    zoom: 2
-                  }),
-                  layers: [
-                    new TileLayer({
-                      source: new TileWMS({
-                        projection: 'EPSG:4326', //HERE IS THE DATA SOURCE PROJECTION
-                        url: 'https://ahocevar.com/geoserver/wms',
-                        params: {
-                          'LAYERS': 'ne:NE1_HR_LC_SR_W_DR'
-                        }
-                      })
-                    })
-                  ]*/
                 ///TODO: AGGIUNGI QUI LE PROPERTIES CHE DEVI VISUALIZZARE NEL POPUP
                 var singleFeature = new ol.Feature({
-                    id: i,
+                    id: i,  //QUESTO PERMETTE DI AVERE IL COLLEGAMENTO CON GLI OGGETTI DATA anche se sono separati
                     geometry: new ol.geom.Point(new ol.proj.fromLonLat([Lon, Lat])),	 //new ol.geom.Point([Lon, Lat]),
                     title: onMouseOverText,
                     OnClickTextIT: ""
                 });
                 //TODO:VERIIFCARE ID DELLA FEATURE //
-                //singleFeature.setId(i);
 
-                //String //pippo.concat("stroke-width=\"","3","\"")
-                //String().concat()
                 var strokeString = new String();
                 var strokeWidthString = new String();
                 var fillString = new String()
@@ -609,88 +586,96 @@ var GmapsTools = function(){
                     markersArray[i]['Note'] = Reliability,
                     markersArray[i]['EpiType'] = Epicenter,
                     // markersArray[i]['EpiIcon'] = EpiIcon,
-                    markersArray[i]['EpiIcon'] = EpiIcon,
+                    markersArray[i]['EpiIcon'] = EpiIcon
+                    //,
                     //**************TODO:RIPRISTINARE IL MARKER e la virgola alla riga sopra!!! *******/
-                    markersArray[i]['Marker'] = singleFeature
+                    //markersArray[i]['Marker'] = singleFeature
+                //openPopupSpider(markersArray[i]['Marker'], OnClickTextEN, OnClickTextIT, markersArray[i]['Nterr'], markersArray[i]['Lat'], markersArray[i]['Lon']);
 //************************************TODO:GESTIONE DESERIALIZZAZIONE+GEOJSON***********************************************************//
-//                 var format = new ol.format.GeoJSON();
-//                 // provare anche writeFeatureObject
-//                 //var geoJsonObj = format.writeFeature(singleFeature, { dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-//                 var geoJsonObj = format.writeFeatureObject(markersArray[i]['Marker']); //,{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-//                 geoJsonObj.properties.Style=markersArray[i]['Marker'].getStyle();                   //e' necessario assegnare due properties altrimenti non riesce
-//                 geoJsonObj.properties.OnClickTextIT = markersArray[i]['Marker'].OnClickTextIT;
-//                 // {"type":"Feature","geometry":{"type":"Point","coordinates":[27.167,36.833]},"properties":{"id":1412,"title":"554 – 558","OnClickTextIT":""}}
-//                 ///geoJSONArray.push(geoJsonObj);
-//                 console.log(geoJsonObj);
-//                 //{"type":"Feature","geometry":{"type":"Point","coordinates":[33.398,34.943]},"properties":{"id":1727,"title":"1491 04 24","OnClickTextIT":""},"Style":{"geometry_":null,"fill_":null,"image_":{"opacity_":1,"rotateWithView_":false,"rotation_":0,"scale_":0.092,"scaleArray_":[0.092,0.092],"displacement_":[0,0],"anchor_":[0.5,0.5],"normalizedAnchor_":null,"anchorOrigin_":"top-left","anchorXUnits_":"fraction","anchorYUnits_":"fraction","crossOrigin_":null,"color_":null,"iconImage_":{"disposed":false,"pendingRemovals_":null,"dispatching_":null,"listeners_":null,"hitDetectionImage_":null,"image_":{},"canvas_":{},"color_":null,"unlisten_":null,"imageState_":0,"size_":null,"src_":"data:image/svg+xml;utf8,%3Csvg%20viewBox%3D%220%200%20250%20250%22%20height%3D%22200px%22%20width%3D%22200px%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20version%3D%221.1%22%3E%3Cpath%20d%3D%22M%20125%2C5%20155%2C90%20245%2C90%20175%2C145%20200%2C230%20125%2C180%2050%2C230%2075%2C145%205%2C90%2095%2C90%20z%22%20fill%3D%22%23f93a00%22%20stroke%3D%22%23000000%22%20stroke-width%3D%2210%22%20/%3E%3C/svg%3E"},"offset_":[0,0],"offsetOrigin_":"top-left","origin_":null,"size_":null},"renderer_":null,"stroke_":null,"text_":null},"OnClickTextIT":"<div class=\"iw-title quakeColor\">Data: <b>1491 04 24</b> Ora: <b>17:00</b> Area epicentrale: <b>Cyprus</b></div>\n<div class=\"EQinfoIW\"><br /><b>Epicentro calcolato</b> (Lat.: <b>34.943</b> - Lon.: <b>33.398</b>)<br /><br />\nIntensità Epicentrale: <b>9</b><br />\nIntensità Massima: <b>9</b><br />\nMagnitudo Equivalente: <b>6.5</b><br />\nNumero di osservazioni macrosismiche: <b>10</b><br /><br />\n<a href=\"http://localhost/quake.php?M2375IT\" target=\"_blank\"> Pagina del terremoto </a> <br /><br /></div>\n</div>"}*/
-//                 //console.log(JSON.stringify(geoJsonObj))
-//                 openPopupSpider(geoJsonObj, OnClickTextEN, OnClickTextIT, markersArray[i]['Nterr'], markersArray[i]['Lat'], markersArray[i]['Lon']);
-//                 geoJSONArray.features.push(geoJsonObj);
+                //TODO: se non presente la variabile caricata all'inizio dalla cache li crea
+                var format = new ol.format.GeoJSON();
+                // provare anche writeFeatureObject
+                //var geoJsonObj = format.writeFeature(singleFeature, { dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+                //{"type":"Feature","geometry":{"type":"Point","coordinates":[33.398,34.943]},"properties":{"id":1727,"title":"1491 04 24","OnClickTextIT":""},"Style":{"geometry_":null,"fill_":null,"image_":{"opacity_":1,"rotateWithView_":false,"rotation_":0,"scale_":0.092,"scaleArray_":[0.092,0.092],"displacement_":[0,0],"anchor_":[0.5,0.5],"normalizedAnchor_":null,"anchorOrigin_":"top-left","anchorXUnits_":"fraction","anchorYUnits_":"fraction","crossOrigin_":null,"color_":null,"iconImage_":{"disposed":false,"pendingRemovals_":null,"dispatching_":null,"listeners_":null,"hitDetectionImage_":null,"image_":{},"canvas_":{},"color_":null,"unlisten_":null,"imageState_":0,"size_":null,"src_":"data:image/svg+xml;utf8,%3Csvg%20viewBox%3D%220%200%20250%20250%22%20height%3D%22200px%22%20width%3D%22200px%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20version%3D%221.1%22%3E%3Cpath%20d%3D%22M%20125%2C5%20155%2C90%20245%2C90%20175%2C145%20200%2C230%20125%2C180%2050%2C230%2075%2C145%205%2C90%2095%2C90%20z%22%20fill%3D%22%23f93a00%22%20stroke%3D%22%23000000%22%20stroke-width%3D%2210%22%20/%3E%3C/svg%3E"},"offset_":[0,0],"offsetOrigin_":"top-left","origin_":null,"size_":null},"renderer_":null,"stroke_":null,"text_":null},"OnClickTextIT":"<div class=\"iw-title quakeColor\">Data: <b>1491 04 24</b> Ora: <b>17:00</b> Area epicentrale: <b>Cyprus</b></div>\n<div class=\"EQinfoIW\"><br /><b>Epicentro calcolato</b> (Lat.: <b>34.943</b> - Lon.: <b>33.398</b>)<br /><br />\nIntensità Epicentrale: <b>9</b><br />\nIntensità Massima: <b>9</b><br />\nMagnitudo Equivalente: <b>6.5</b><br />\nNumero di osservazioni macrosismiche: <b>10</b><br /><br />\n<a href=\"http://localhost/quake.php?M2375IT\" target=\"_blank\"> Pagina del terremoto </a> <br /><br /></div>\n</div>"}*/
+                var geoJsonObj = format.writeFeatureObject(singleFeature);//markersArray[i]['Marker']); //,{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+                geoJsonObj.properties.Style=singleFeature.getStyle();//markersArray[i]['Marker'].getStyle();                   //e' necessario assegnare due properties altrimenti non riesce
+                geoJsonObj.properties.OnClickTextIT = singleFeature.OnClickTextIT;//markersArray[i]['Marker'].OnClickTextIT;
+                //console.log(geoJsonObj);
+                //google.maps.event.addListener(marker, 'click', function() { //TODO: L'ELEMENTO NON E' SERIALIZZABILE per ora test senza
+                //openPopupSpider(geoJsonObj, OnClickTextEN, OnClickTextIT, markersArray[i]['Nterr'], markersArray[i]['Lat'], markersArray[i]['Lon']);
+
+
+                geoJSONArray.features.push(geoJsonObj);
+
+
 //************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
 
-                /*const workingIconFeature = new ol.Feature({
-                geometry: new ol.geom.Point([-1, -1])
-                });
-
-                const workingSvg = `<svg width="4cm" height="4cm" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" version="1.1"><path d="M 125,5 155,90 245,90 175,145 200,230 125,180 50,230 75,145 5,90 95,90 z" fill="white" stroke="black" stroke-width="3" /></svg>`;
-
-                const workingStyle = new ol.style.Style({
-                  image: new ol.style.Icon({
-                    opacity: 1,
-                    src: 'data:image/svg+xml;utf8,' + escape(workingSvg),
-                    scale: 1
-                  })
-                });
-
-                workingIconFeature.setStyle(workingStyle);*/
-
-
-                // Call function that opens pop up window with quake info
-                //console.log('chiamata a openPopupSpider' );
-                //**************TODO:RIPRISTINARE riGA SOTTO!!! *******/
-                openPopupSpider(markersArray[i]['Marker'], OnClickTextEN, OnClickTextIT, markersArray[i]['Nterr'], markersArray[i]['Lat'], markersArray[i]['Lon']);
             }
         }
 
         console.log("Caricamento quakes finito");
 
 //************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
-//                 console.log("markersArray in memoria chiamata a url di test per save json...")
-//                 console.log(markersArray[0]);
-//                 console.log(JSON.stringify(markersArray[0]));
-//
-//                 var dataInput = { data: markersArray[0] };
-//                 console.log(dataInput);
                 ///TODO: DESERIALIZZAZIONE QUANDO JSON.stringify restituisce []
+                console.log("Deserializzazione quando JSON.stringify fallisce (NO markers): quakesData_MarkersArray= var quakesData_MarkersArray = Object.assign({}, markersArray[0]); ");
+                for (var i = 0; i < markersArray.length; ++i){
+                    quakesDataArray.elements.push(Object.assign({}, markersArray[i]));
+                    /* quakesData_MarkersArray= funziona ma senza il marker che da riferimento circolare altrimenti.
+                    index.js:656 {"Date":10000100,"DateLabel":"1000 01 -","TimeLabel":"-","Nterr":"00001","Lat":"46.000","Lon":"14.500","Location":"Yugoslavia","Country":"Slovenia","Io":0,"Year":1000,"Month":"01","Day":"00","Hour":0,"Minu":0,"Sec":0,"Me":0,"Imax":0,"Zone":"ITA","Npun":0,"FlagFalse":true,"Level":"S","Note":"F","EpiType":"-","EpiIcon":"F"}*/
+                }
+                //console.log("quakesData_MarkersArray=>" + JSON.stringify(quakesDataArray));
+                //var yourStrTo_objectAgain= JSON.parse(JSON.stringify(quakesData_MarkersArray));
+                //console.log("yourStrTo_objectAgain=>");console.log(yourStrTo_objectAgain);
 
-                // console.log("tentativo disperato deserializzazione senza markers: your_objectToStrf= var your_objectToStrf = Object.assign({}, markersArray[0]); ");
-                // var your_objectToStrf = Object.assign({}, markersArray[0]);
-                // console.log("your_objectToStrf=>" + JSON.stringify(your_objectToStrf));
-                // var yourStrTo_objectAgain= JSON.parse(JSON.stringify(your_objectToStrf));
-                // console.log("yourStrTo_objectAgain=>");
-                // console.log(yourStrTo_objectAgain);
-                /*tentativo disperato: your_objectToStrf= funziona ma senza il marker che da riferimento circolare altrimenti.
-index.js:656 {"Date":10000100,"DateLabel":"1000 01 -","TimeLabel":"-","Nterr":"00001","Lat":"46.000","Lon":"14.500","Location":"Yugoslavia","Country":"Slovenia","Io":0,"Year":1000,"Month":"01","Day":"00","Hour":0,"Minu":0,"Sec":0,"Me":0,"Imax":0,"Zone":"ITA","Npun":0,"FlagFalse":true,"Level":"S","Note":"F","EpiType":"-","EpiIcon":"F"}*/
+                console.log("GeoJSON deserialize test...");
+                console.log(JSON.stringify(geoJSONArray)); //SE USI LO STRINGIFY DA ERRORE RIFERIMENTO CIRCOLARE a causa dell'evento click dello spider MA MAGARI A STRINGA E' POSSIBILE INSTANZIARLO DIRETTO COME OGGETTO JS:
+        /*var geoJSONArray={ !! "type": "FeatureCollection",
+            "features": [ ]
+        !! } ; //recuperando i valori stringa dal server*/
+        //TODO: se non presente la variabile caricata all'inizio dalla cache li salva
+                $.ajax({
+                    url: '/saveQuakesData',  //http://localhost/saveQuakesData => Route::post('/test','PhotoController@saveQuakesData');
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'json',
+                    data:  JSON.stringify(quakesDataArray),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function(data){
+                        if(data.success == true){
+                            console.log("success saved quakesDataArray<=markersArray.");
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(textStatus);
+                        console.error(errorThrown);
+                    }
 
-                // $.ajax({
-                //     url: '/test',  //http://localhost/test => Route::post('/test','PhotoController@saveJson');
-                //     type: 'POST',
-                //     dataType: 'json',
-                //     contentType: 'json',
-                //     data:  JSON.stringify(your_objectToStrf),
-                //     contentType: 'application/json; charset=utf-8',
-                //     success: function(data){
-                //         if(data.success == true){
-                //             //alert('success');
-                //             console.log("success saved markersArray.");
-                //         }
-                //     },
-                //     error: function (jqXHR, textStatus, errorThrown) {
-                //         console.error(textStatus);
-                //         console.error(errorThrown);
-                //     }
-                //
-                // });
+                }).then( function( dummy ) {
+                    console.log("starting saveQuakesGeoJSONData.....");
+                    $.ajax({
+                    url: '/saveQuakesGeoJSONData',  //http://localhost/saveQuakesGeoJSONData => Route::post('/test','PhotoController@saveQuakesGeoJSONData');
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'json',
+                    data: JSON.stringify(geoJSONArray),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function(data){
+                        if(data.success == true){
+                            console.log("success saved geoJSONArray<=features.");
+                            //TODO: qui è possibile eseguire il ciclo per il popup spider
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(textStatus);
+                        console.error(errorThrown);
+                    }
+
+                    });
+                });
+
+
+
+
 //************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
 
 
@@ -1261,7 +1246,7 @@ var MenuTools = function(){
 		this.setPeriod();
 		this.setIo();
 
-		ResetMap();
+		ResetMap(); //*****TODO: CHIAMATA A SHOWQUAKES****/
 	}
 }
 
@@ -1329,7 +1314,7 @@ function initializeEq(){
 	IntervalVar = setInterval(function(){
 		if(true == XMLQuakeListArrived){
 			clearInterval(IntervalVar);
-			MenuPilot.setMenu();
+			MenuPilot.setMenu(); //
 		}
 	},10);
 

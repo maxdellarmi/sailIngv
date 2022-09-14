@@ -18,14 +18,27 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//PRIMA PAGINA ORIGINALE
 Route::get('/cfti5', function () {
     return view('indexCFTI5');
+});
+//PAGINA TERREMOTI MODIFICATA CACHING STORAGE
+Route::get('/cfti5CS', function () {
+    return view('indexCFTI5CStorage');
 });
 
 
 
 //Route::get('/test','PhotoController@saveJson');
 Route::post('/test','PhotoController@saveJson');
+
+/**************TODO:GESTIONE TERREMOTI BEGIN ************************/
+Route::get('/loadQuakesDataFromCache','PhotoController@loadQuakesDataFromCache');
+Route::post('/saveQuakesData','PhotoController@saveQuakesData');
+Route::post('/saveQuakesGeoJSONData','PhotoController@saveQuakesGeoJSONData');
+Route::get('/loadGeoJSONDataFromCache','PhotoController@loadGeoJSONDataFromCache');
+//TODO: effettuare il get di geoJSON ma poi passare al blade in fase di caricamento iniziare i dati
+/**************TODO:GESTIONE TERREMOTI BEGIN ************************/
 
 
 Route::get('/indexQuakesXML','PhotoController@indexQuakesXML');

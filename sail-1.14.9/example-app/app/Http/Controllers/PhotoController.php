@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use phpDocumentor\Reflection\Types\Integer;
+use phpDocumentor\Reflection\Types\Void_;
 use stdClass;
 //use GuzzleHttp\Middleware;
 //use Psr\Http\Message\RequestInterface;
@@ -30,6 +31,94 @@ class PhotoController extends Controller
         //echo "saved";
         echo json_encode(array('success'=>'true'));
     }
+/**************TODO:GESTIONE TERREMOTI BEGIN ************************/
+    /**Salvataggio dei dati di base dei terremoti che dall'XML sono stati elaborati in JS nell'oggetto markersArray e vengono salvati [la classe MARKER viene gestita separatamente]
+     * L'informazione viene anche cachata.
+     * {"Date":10000100,"DateLabel":"1000 01 -","TimeLabel":"-","Nterr":"00001","Lat":"46.000","Lon":"14.500","Location":"Yugoslavia","Country":"Slovenia","Io":0,"Year":1000,"Month":"01","Day":"00","Hour":0,"Minu":0,"Sec":0,"Me":0,"Imax":0,"Zone":"ITA","Npun":0,"FlagFalse":true,"Level":"S","Note":"F","EpiType":"-","EpiIcon":"F"}
+     * @param Request $request
+     * @return void
+     */
+    function saveQuakesData(Request $request): void
+    {
+        Log::info("saveQuakesData called START");
+        $data = json_decode($request->getContent());  //object stdClass dopo averlo convertito dal json in input
+        Log::info("DATA saveQuakesData:" . $request->getContent() ); //logga il json in input
+        Log::info("saveQuakesData called END");
+        $saveQuakesData = Cache::get('saveQuakesData');
+        if (!isset($saveQuakesData)) {
+            Cache::forever('saveQuakesData', json_encode($data));
+        }
+        echo json_encode(array('success'=>'true'));
+    }
+
+    /**
+     * @param Request $request
+     * @return void
+     */
+    function saveQuakesGeoJSONData(Request $request): void
+    {
+        Log::info("saveQuakesGeoJSONData called START");
+        $data = json_decode($request->getContent());  //object stdClass dopo averlo convertito dal json in input
+        Log::info("DATA saveQuakesGeoJSONData:" . $request->getContent() ); //logga il json in input
+        Log::info("saveQuakesGeoJSONData called END");
+        $saveQuakesGeoJSONData = Cache::get('saveQuakesGeoJSONData');
+        if (!isset($saveQuakesGeoJSONData)) {
+            Cache::forever('saveQuakesGeoJSONData', json_encode($data));
+        }
+        echo json_encode(array('success'=>'true'));
+    }
+
+    /*** Restituisce la collezione markersArray solo se questa è stata già cachata
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function loadQuakesDataFromCache()
+    {
+        $saveQuakesData = Cache::get('saveQuakesData');
+        if (isset($saveQuakesData)) {
+             return response()->json( json_decode($saveQuakesData));
+        }
+        echo json_encode(array('failed'=>'true'));
+    }
+
+    /**
+     * Restituisce la collezione markersArray solo se questa è stata già cachata
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function loadGeoJSONDataFromCache()
+    {
+        $saveQuakesGeoJSONData = Cache::get('saveQuakesGeoJSONData');
+        if (isset($saveQuakesGeoJSONData)) {
+            return response()->json( json_decode($saveQuakesGeoJSONData));
+        }
+        echo json_encode(array('failed'=>'true'));
+    }
+
+    /**
+     * @return mixed Restituisce XML dei terremoti dal file locale cachato
+     */
+    public function loadQuakesXML(){
+
+        Log::info('loadQuakesXML@@Attempt display data From REDIS server START');
+        $listXML = Cache::rememberForever('loadQuakesXML', function () {
+            Log::info('loadQuakesXML@@LOADING XMLFile FROM DISK STARTED...........');
+            $objXmlDocument = simplexml_load_file("QuakeList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
+            if ($objXmlDocument === FALSE) {
+                echo "There were errors parsing the XML file.\n";
+                foreach (libxml_get_errors() as $error) {
+                    echo $error->message;
+                }
+                exit;
+            }
+            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
+            return $objXmlDocument->asXML();
+        });
+        Log::info('loadQuakesXML@@Attempt display data From REDIS server END returning data');
+        header('Content-Type: application/xml');
+        return $listXML;
+    }
+
+/**************TODO:GESTIONE TERREMOTI  END************************/
 
 
     /**
@@ -150,8 +239,8 @@ class PhotoController extends Controller
     public function indexLoadXML2()
     {
         Log::info('@@Attempt display data From REDIS server START');
-          $listXML = Cache::rememberForever('LocListForever', function () {
-              Log::info('@@Display XMLFile  STARTED...........');
+        $listXML = Cache::rememberForever('LocListForever', function () {
+            Log::info('@@Display XMLFile  STARTED...........');
             $objXmlDocument = simplexml_load_file("LocList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
             if ($objXmlDocument === FALSE) {
                 echo "There were errors parsing the XML file.\n";
@@ -168,7 +257,7 @@ class PhotoController extends Controller
             Log::info("@@Display XMLFile  FILE count N:" . count($arrOutput["Loc"]) );
 
             //Cache::forever('LocList', $objJsonDocument);
-              Log::info('@@Display XMLFile ENDED...........');
+            Log::info('@@Display XMLFile ENDED...........');
             return $arrOutput;
         });
         Log::info('@@Attempt display data From REDIS server END ');

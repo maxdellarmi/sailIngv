@@ -88,614 +88,530 @@ var GmapsTools = function(){
 	var callBackBlock;
 	var FormReference;
 	var XMLData;
-	//var XMLDoc;
-	// var deferredEvent = $.Deferred;
 	this.itemName = 'maps';
 	this.callBackBlock = 'map';
-	this.requestData = function(){
+    this.requestData = function(){
 		//new LogTools().addLog('Requesting quakes<br />', 40);
-		var ajaxUpdater = new Manajax(xmlService);
+
+  /****TODO: Manajax service commentato gestione NEW caching ***/
+        /**** var ajaxUpdater = new Manajax(xmlService);
 		ajaxUpdater.TxType = 'GET';
 		ajaxUpdater.responseType = 'xml';
 		this.callBackBlock = 'map';
 		ajaxUpdater.callBackFunc = this.parseQuakes;
 		ajaxUpdater.toScroll = false;
-		ajaxUpdater.requestAction();
-	}
+		ajaxUpdater.requestAction(); *****/
 
-	// ============== Get data from XML and create data structure 'Markersarray' containing all information, including Gmap markers
-	this.parseQuakes = function(XmlText) {
-        //new LogTools().addLog('....Parsing all quakes<br />', 80);
-        console.log("INIZIO CARICAMENTO DI TUTTI I TERREMOTI");
-        XMLQuakeList = new DOMParser().parseFromString(XmlText.trim(), 'text/xml');
-        XMLQuakeListArrived = true;
 
-        // console.log(XMLQuakeList);
-        // console.log(XMLQuakeListArrived);
-
-        var markers = XMLQuakeList.documentElement.getElementsByTagName("Quake");
-
-        if (markers.length > 0) {
-            for (var i = 0; i < markers.length; i++) {
-                // not empty values needed!!!!
-                // obtain attribues of each marker
-                var Nterr = markers[i].getElementsByTagName("nterr")[0].childNodes[0].nodeValue;
-                var Location = XMLQuakeList.getElementsByTagName("earthquakelocation")[i].childNodes[0].nodeValue;
-                var Country = XMLQuakeList.getElementsByTagName("country")[i].childNodes[0].nodeValue;
-                var Zone = XMLQuakeList.getElementsByTagName("cat")[i].childNodes[0].nodeValue;
-                var Io = parseFloat(XMLQuakeList.getElementsByTagName("io")[i].childNodes[0].nodeValue);
-                var Imax = parseFloat(XMLQuakeList.getElementsByTagName("imax")[i].childNodes[0].nodeValue);
-
-                if (Imax == 9.1) Imax = 9;
-                if (Imax == 8.2) Imax = 8;
-                if (Imax == 8.1) Imax = 8;
-                if (Imax == 6.1) Imax = 6;
-                if (Imax == 6.6) Imax = 6.5;
-                if (Imax == 4.6) Imax = 4.5;
-                if (Imax == 5.1) Imax = 5;
-
-                var Me = parseFloat(XMLQuakeList.getElementsByTagName("mm")[i].childNodes[0].nodeValue);
-
-                // salva nperiod e nterr che servono per index EE
-                if (Zone != "MED") {
-                    NperiodEQ[i] = markers[i].getElementsByTagName("nperiod")[0].childNodes[0].nodeValue;
-                    NterrEQ[i] = markers[i].getElementsByTagName("nterr")[0].childNodes[0].nodeValue;
-                } else {
-                    // alert(Location)
-                    NperiodEQ[i] = " ";
-                    NterrEQ[i] = " "
+        $.ajax({
+            url: '/indexQuakesXML',  //http://localhost/indexQuakesXML => Route::get('/indexQuakesXML','PhotoController@indexQuakesXML');
+            type: 'GET',
+            dataType: 'text', //text/xml
+            contentType: 'text/xml',
+            //data:  JSON.stringify(quakesDataArray),
+            contentType: 'application/json; charset=utf-8',
+            success: function(data){
+                if(data !== undefined){
+                    console.log("success loaded xml quakes from server...");
+                    //console.log(data);
                 }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error(textStatus);
+                console.error(errorThrown);
+            }
 
-                //verifico la lunghezza del campo, perchè se è vuoto il "nodeValue" restituisce errore
-                var flagNP = XMLQuakeList.getElementsByTagName("npun")[i].childNodes.length;
-                if (flagNP > 0) {
-                    var Npun = XMLQuakeList.getElementsByTagName("npun")[i].childNodes[0].nodeValue;
-                } else {
-                    Npun = 0
-                }
-                ;
-                Npun = parseInt(Npun)
+        }).then ( function(XmlText) {  //ajaxUpdater.callBackFunc = this.parseQuakes;
+            //IMPLEMENTAZIONE CALLBACK dalla PRIMA CHIAMATA EFFETTUATA.
+            // ============== Get data from XML and create data structure 'Markersarray' containing all information, including Gmap markers
+            //new LogTools().addLog('....Parsing all quakes<br />', 80);
+            console.log("INIZIO CARICAMENTO DI TUTTI I TERREMOTI");
+            //console.log(XmlText);
+            XMLQuakeList = new DOMParser().parseFromString(XmlText.trim(), 'text/xml');
+            XMLQuakeListArrived = true;
 
-                //verifico la lunghezza del campo, perchè se è vuoto il "nodeValue" restituisce errore
-                var flagET = XMLQuakeList.getElementsByTagName("epicenter_type")[i].childNodes.length;
-                if (flagET > 0) {
-                    Epicenter = XMLQuakeList.getElementsByTagName("epicenter_type")[i].childNodes[0].nodeValue;
-                } else {
-                    Epicenter = "Local effects"
-                }
-                ;
-                // if (Epicenter == "Not parameterized") Epicenter = "Calculated epicentre"
-                //if (Epicenter == "-") Epicenter = "Local effects"
+            // console.log(XMLQuakeList);
+            // console.log(XMLQuakeListArrived);
 
-                if (XMLQuakeList.getElementsByTagName("rel")[i].length == 0) var Reliability = ""
-                else if (XMLQuakeList.getElementsByTagName("rel")[i].childNodes.length == 0) var Reliability = ""
-                else var Reliability = XMLQuakeList.getElementsByTagName("rel")[i].childNodes[0].nodeValue;
-                if (Reliability == "?") {
-                    Reliability = "S"
-                }
+            var markers = XMLQuakeList.documentElement.getElementsByTagName("Quake");
 
-                if (XMLQuakeList.getElementsByTagName("level")[i].length == 0) var EQlevel = "A"
-                else if (XMLQuakeList.getElementsByTagName("level")[i].childNodes.length == 0) var EQlevel = "A"
-                else var EQlevel = XMLQuakeList.getElementsByTagName("level")[i].childNodes[0].nodeValue;
+            if (markers.length > 0) {
+                for (var i = 0; i < markers.length; i++) {
+                    // not empty values needed!!!!
+                    // obtain attribues of each marker
+                    var Nterr = markers[i].getElementsByTagName("nterr")[0].childNodes[0].nodeValue;
+                    var Location = XMLQuakeList.getElementsByTagName("earthquakelocation")[i].childNodes[0].nodeValue;
+                    var Country = XMLQuakeList.getElementsByTagName("country")[i].childNodes[0].nodeValue;
+                    var Zone = XMLQuakeList.getElementsByTagName("cat")[i].childNodes[0].nodeValue;
+                    var Io = parseFloat(XMLQuakeList.getElementsByTagName("io")[i].childNodes[0].nodeValue);
+                    var Imax = parseFloat(XMLQuakeList.getElementsByTagName("imax")[i].childNodes[0].nodeValue);
+
+                    if (Imax == 9.1) Imax = 9;
+                    if (Imax == 8.2) Imax = 8;
+                    if (Imax == 8.1) Imax = 8;
+                    if (Imax == 6.1) Imax = 6;
+                    if (Imax == 6.6) Imax = 6.5;
+                    if (Imax == 4.6) Imax = 4.5;
+                    if (Imax == 5.1) Imax = 5;
+
+                    var Me = parseFloat(XMLQuakeList.getElementsByTagName("mm")[i].childNodes[0].nodeValue);
+
+                    // salva nperiod e nterr che servono per index EE
+                    if (Zone != "MED") {
+                        NperiodEQ[i] = markers[i].getElementsByTagName("nperiod")[0].childNodes[0].nodeValue;
+                        NterrEQ[i] = markers[i].getElementsByTagName("nterr")[0].childNodes[0].nodeValue;
+                    } else {
+                        // alert(Location)
+                        NperiodEQ[i] = " ";
+                        NterrEQ[i] = " "
+                    }
+
+                    //verifico la lunghezza del campo, perchè se è vuoto il "nodeValue" restituisce errore
+                    var flagNP = XMLQuakeList.getElementsByTagName("npun")[i].childNodes.length;
+                    if (flagNP > 0) {
+                        var Npun = XMLQuakeList.getElementsByTagName("npun")[i].childNodes[0].nodeValue;
+                    } else {
+                        Npun = 0
+                    }
+                    ;
+                    Npun = parseInt(Npun)
+
+                    //verifico la lunghezza del campo, perchè se è vuoto il "nodeValue" restituisce errore
+                    var flagET = XMLQuakeList.getElementsByTagName("epicenter_type")[i].childNodes.length;
+                    if (flagET > 0) {
+                        Epicenter = XMLQuakeList.getElementsByTagName("epicenter_type")[i].childNodes[0].nodeValue;
+                    } else {
+                        Epicenter = "Local effects"
+                    }
+                    ;
+                    // if (Epicenter == "Not parameterized") Epicenter = "Calculated epicentre"
+                    //if (Epicenter == "-") Epicenter = "Local effects"
+
+                    if (XMLQuakeList.getElementsByTagName("rel")[i].length == 0) var Reliability = ""
+                    else if (XMLQuakeList.getElementsByTagName("rel")[i].childNodes.length == 0) var Reliability = ""
+                    else var Reliability = XMLQuakeList.getElementsByTagName("rel")[i].childNodes[0].nodeValue;
+                    if (Reliability == "?") {
+                        Reliability = "S"
+                    }
+
+                    if (XMLQuakeList.getElementsByTagName("level")[i].length == 0) var EQlevel = "A"
+                    else if (XMLQuakeList.getElementsByTagName("level")[i].childNodes.length == 0) var EQlevel = "A"
+                    else var EQlevel = XMLQuakeList.getElementsByTagName("level")[i].childNodes[0].nodeValue;
 
 
-                var Lat = parseFloat(XMLQuakeList.getElementsByTagName("lat")[i].childNodes[0].nodeValue).toFixed(3);
-                var Lon = parseFloat(XMLQuakeList.getElementsByTagName("lon")[i].childNodes[0].nodeValue).toFixed(3);
+                    var Lat = parseFloat(XMLQuakeList.getElementsByTagName("lat")[i].childNodes[0].nodeValue).toFixed(3);
+                    var Lon = parseFloat(XMLQuakeList.getElementsByTagName("lon")[i].childNodes[0].nodeValue).toFixed(3);
 
 
-                var DateLabel = XMLQuakeList.getElementsByTagName("data_label")[i].childNodes[0].nodeValue;
+                    var DateLabel = XMLQuakeList.getElementsByTagName("data_label")[i].childNodes[0].nodeValue;
 
-                var Year = parseInt(XMLQuakeList.getElementsByTagName("anno")[i].childNodes[0].nodeValue);
+                    var Year = parseInt(XMLQuakeList.getElementsByTagName("anno")[i].childNodes[0].nodeValue);
 
-                var CheckMonth = XMLQuakeList.getElementsByTagName("mese")[i];
-                var Month = CheckMonth.childNodes.length ? CheckMonth.childNodes[0].nodeValue : '';
-                if (Month == "") Month = "00"
+                    var CheckMonth = XMLQuakeList.getElementsByTagName("mese")[i];
+                    var Month = CheckMonth.childNodes.length ? CheckMonth.childNodes[0].nodeValue : '';
+                    if (Month == "") Month = "00"
 
-                var CheckDay = XMLQuakeList.getElementsByTagName("giorno")[i];
-                var Day = CheckDay.childNodes.length ? CheckDay.childNodes[0].nodeValue : '';
-                if (Day == "") Day = "00"
+                    var CheckDay = XMLQuakeList.getElementsByTagName("giorno")[i];
+                    var Day = CheckDay.childNodes.length ? CheckDay.childNodes[0].nodeValue : '';
+                    if (Day == "") Day = "00"
 
-                var TimeLabel = XMLQuakeList.getElementsByTagName("time_label")[i].childNodes[0].nodeValue;
+                    var TimeLabel = XMLQuakeList.getElementsByTagName("time_label")[i].childNodes[0].nodeValue;
 
-                var CheckHour = XMLQuakeList.getElementsByTagName("ora")[i];
-                var Hour = CheckHour.childNodes.length ? CheckHour.childNodes[0].nodeValue : '';
-                if (Hour == "-9" || Hour == "") Hour = 0;
+                    var CheckHour = XMLQuakeList.getElementsByTagName("ora")[i];
+                    var Hour = CheckHour.childNodes.length ? CheckHour.childNodes[0].nodeValue : '';
+                    if (Hour == "-9" || Hour == "") Hour = 0;
 
-                var CheckMinu = XMLQuakeList.getElementsByTagName("minu")[i];
-                var Minu = CheckMinu.childNodes.length ? CheckMinu.childNodes[0].nodeValue : '';
-                if (Minu == "-9" || Minu == "") Minu = 0;
+                    var CheckMinu = XMLQuakeList.getElementsByTagName("minu")[i];
+                    var Minu = CheckMinu.childNodes.length ? CheckMinu.childNodes[0].nodeValue : '';
+                    if (Minu == "-9" || Minu == "") Minu = 0;
 
-                var CheckSec = XMLQuakeList.getElementsByTagName("sec")[i];
-                var Sec = CheckSec.childNodes.length ? CheckSec.childNodes[0].nodeValue : '';
-                if (Sec == "-9" || Sec == "") Sec = 0;
-
-
-                var FlagFalse = XMLQuakeList.getElementsByTagName("flagfalseeq")[i].childNodes.length ? true : false;
-
-                var QuakePage = createQuakePageLink(window.location.href, Nterr.trim(), 'index')
-
-                var Star;
-                var StarH;
-                var Shape;
-                var onMouseOverText = DateLabel;
-
-                // Load markers image (different for ITA and MED) and define their size, based on epicentral intensity
+                    var CheckSec = XMLQuakeList.getElementsByTagName("sec")[i];
+                    var Sec = CheckSec.childNodes.length ? CheckSec.childNodes[0].nodeValue : '';
+                    if (Sec == "-9" || Sec == "") Sec = 0;
 
 
-                // ---- define marker icons
-                EPIpathCALC = 'M 125,5 155,90 245,90 175,145 200,230 125,180 50,230 75,145 5,90 95,90 z';
-                //   --------------------------------------------  Epincenter type: FALSE   ---------------------------------------------------------
-                if (FlagFalse) {
-                    Star = {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        strokeColor: "#000000",
-                        scale: 4,
-                        fillColor: "none",   //per gestire cerchi vuoti
-                        strokeWeight: 25
-                    }; //3
-                    EpiIcon = "F";
-                    //   --------------------------------------------  Epincenter type: NOT PARAMETERIZED   ---------------------------------------------------------
-                } else if (Epicenter === "Not parameterized") {
-                    var EpicenterITA = "Non parametrizzato";
-                    var EpicenterENG = Epicenter;
-                    Star = {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        strokeColor: "#000000",
-                        fillColor: "#000000",
-                        fillOpacity: 1,
-                        scale: 5
-                    };
-                    EpiIcon = "NP";
-                    //   --------------------------------------------  Epincenter type: CALCULATED   ---------------------------------------------------------
-                } else {
-                    if (Epicenter === "Calculated epicentre") {
-                        var EpicenterITA = "Epicentro calcolato";
+                    var FlagFalse = XMLQuakeList.getElementsByTagName("flagfalseeq")[i].childNodes.length ? true : false;
+
+                    var QuakePage = createQuakePageLink(window.location.href, Nterr.trim(), 'index')
+
+                    var Star;
+                    var StarH;
+                    var Shape;
+                    var onMouseOverText = DateLabel;
+
+                    // Load markers image (different for ITA and MED) and define their size, based on epicentral intensity
+
+
+                    // ---- define marker icons
+                    EPIpathCALC = 'M 125,5 155,90 245,90 175,145 200,230 125,180 50,230 75,145 5,90 95,90 z';
+                    //   --------------------------------------------  Epincenter type: FALSE   ---------------------------------------------------------
+                    if (FlagFalse) {
+                        Star = {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            strokeColor: "#000000",
+                            scale: 4,
+                            fillColor: "none",   //per gestire cerchi vuoti
+                            strokeWeight: 25
+                        }; //3
+                        EpiIcon = "F";
+                        //   --------------------------------------------  Epincenter type: NOT PARAMETERIZED   ---------------------------------------------------------
+                    } else if (Epicenter === "Not parameterized") {
+                        var EpicenterITA = "Non parametrizzato";
                         var EpicenterENG = Epicenter;
+                        Star = {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            strokeColor: "#000000",
+                            fillColor: "#000000",
+                            fillOpacity: 1,
+                            scale: 5
+                        };
+                        EpiIcon = "NP";
+                        //   --------------------------------------------  Epincenter type: CALCULATED   ---------------------------------------------------------
+                    } else {
+                        if (Epicenter === "Calculated epicentre") {
+                            var EpicenterITA = "Epicentro calcolato";
+                            var EpicenterENG = Epicenter;
 
-                        if (9.5 < Io) {
-                            Star = {
-                                path: EPIpathCALC,
-                                fillColor: color4,
-                                fillOpacity: 1,
-                                anchor: new google.maps.Point(125, 125),
-                                strokeWeight: 5,
-                                scale: StarScale4
-                            };
-                            EpiIcon = "C_9.5";
-                        }
-                        ;
-                        if (7.5 < Io && 9.5 >= Io) {
-                            Star = {
-                                path: EPIpathCALC,
-                                fillColor: color3,
-                                fillOpacity: 1,
-                                anchor: new google.maps.Point(125, 125),
-                                strokeWeight: 5,
-                                scale: StarScale3
-                            };
-                            EpiIcon = "C_8"
-                        }
-                        ;
-                        if (5.9 < Io && 7.5 >= Io) {
-                            Star = {
-                                path: EPIpathCALC,
-                                fillColor: color2,
-                                fillOpacity: 1,
-                                anchor: new google.maps.Point(125, 125),
-                                strokeWeight: 5,
-                                scale: StarScale2
-                            };
-                            EpiIcon = "C_6";
-                        }
-                        ;
-                        if (6 > Io) {
-                            Star = {
-                                path: EPIpathCALC,
-                                fillColor: color1,
-                                fillOpacity: 1,
-                                anchor: new google.maps.Point(125, 125),
-                                strokeWeight: 5,
-                                scale: StarScale1 * 1.35
-                            };
-                            EpiIcon = "C_4";
-                        }
-                        ;
+                            if (9.5 < Io) {
+                                Star = {
+                                    path: EPIpathCALC,
+                                    fillColor: color4,
+                                    fillOpacity: 1,
+                                    anchor: new google.maps.Point(125, 125),
+                                    strokeWeight: 5,
+                                    scale: StarScale4
+                                };
+                                EpiIcon = "C_9.5";
+                            }
+                            ;
+                            if (7.5 < Io && 9.5 >= Io) {
+                                Star = {
+                                    path: EPIpathCALC,
+                                    fillColor: color3,
+                                    fillOpacity: 1,
+                                    anchor: new google.maps.Point(125, 125),
+                                    strokeWeight: 5,
+                                    scale: StarScale3
+                                };
+                                EpiIcon = "C_8"
+                            }
+                            ;
+                            if (5.9 < Io && 7.5 >= Io) {
+                                Star = {
+                                    path: EPIpathCALC,
+                                    fillColor: color2,
+                                    fillOpacity: 1,
+                                    anchor: new google.maps.Point(125, 125),
+                                    strokeWeight: 5,
+                                    scale: StarScale2
+                                };
+                                EpiIcon = "C_6";
+                            }
+                            ;
+                            if (6 > Io) {
+                                Star = {
+                                    path: EPIpathCALC,
+                                    fillColor: color1,
+                                    fillOpacity: 1,
+                                    anchor: new google.maps.Point(125, 125),
+                                    strokeWeight: 5,
+                                    scale: StarScale1 * 1.35
+                                };
+                                EpiIcon = "C_4";
+                            }
+                            ;
 
-                        //   --------------------------------------------  Epincenter type: LOCAL EFFECTS  ---------------------------------------------------------
-                    } else if (Epicenter === "Local effects") {
-                        EpicenterITA = "Singola località";
-                        EpicenterENG = Epicenter;
+                            //   --------------------------------------------  Epincenter type: LOCAL EFFECTS  ---------------------------------------------------------
+                        } else if (Epicenter === "Local effects") {
+                            EpicenterITA = "Singola località";
+                            EpicenterENG = Epicenter;
 
-                        if (9.5 < Io) {
-                            Star = {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                scale: CircleScale4,
-                                strokeColor: "#000000",
-                                fillColor: color4,
-                                fillOpacity: 1,
-                                strokeWeight: 5
-                            };
-                            EpiIcon = "L_9.5";
-                        }
-                        ;
-                        if (7.5 < Io && 9.5 >= Io) {
-                            Star = {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                scale: CircleScale3,
-                                strokeColor: "#000000",
-                                fillColor: color3,
-                                fillOpacity: 1,
-                                strokeWeight: 5
-                            };
-                            EpiIcon = "L_8";
-                        }
-                        ;
-                        if (5.9 < Io && 7.5 >= Io) {
-                            Star = {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                strokeColor: "#000000",
-                                scale: CircleScale2,
-                                fillColor: color2,
-                                fillOpacity: 1,
-                                strokeWeight: 5
-                            };
-                            EpiIcon = "L_6";
-                        }
-                        ;
-                        if (6 > Io) {
-                            Star = {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                scale: CircleScale1,
-                                strokeColor: "#000000",
-                                fillColor: color1,
-                                fillOpacity: 1,
-                                strokeWeight: 5
-                            };
-                            EpiIcon = "L_4";
-                        }
-                        //   --------------------------------------------  Epincenter type: AREA   ---------------------------------------------------------
-                    } else if (Epicenter === "Region, area") {
-                        EpicenterITA = "Regione, area";
-                        EpicenterENG = Epicenter;
+                            if (9.5 < Io) {
+                                Star = {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: CircleScale4,
+                                    strokeColor: "#000000",
+                                    fillColor: color4,
+                                    fillOpacity: 1,
+                                    strokeWeight: 5
+                                };
+                                EpiIcon = "L_9.5";
+                            }
+                            ;
+                            if (7.5 < Io && 9.5 >= Io) {
+                                Star = {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: CircleScale3,
+                                    strokeColor: "#000000",
+                                    fillColor: color3,
+                                    fillOpacity: 1,
+                                    strokeWeight: 5
+                                };
+                                EpiIcon = "L_8";
+                            }
+                            ;
+                            if (5.9 < Io && 7.5 >= Io) {
+                                Star = {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    strokeColor: "#000000",
+                                    scale: CircleScale2,
+                                    fillColor: color2,
+                                    fillOpacity: 1,
+                                    strokeWeight: 5
+                                };
+                                EpiIcon = "L_6";
+                            }
+                            ;
+                            if (6 > Io) {
+                                Star = {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: CircleScale1,
+                                    strokeColor: "#000000",
+                                    fillColor: color1,
+                                    fillOpacity: 1,
+                                    strokeWeight: 5
+                                };
+                                EpiIcon = "L_4";
+                            }
+                            //   --------------------------------------------  Epincenter type: AREA   ---------------------------------------------------------
+                        } else if (Epicenter === "Region, area") {
+                            EpicenterITA = "Regione, area";
+                            EpicenterENG = Epicenter;
 
-                        if (9.5 < Io) {
-                            Star = {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                fillColor: "none",   //per gestire cerchi vuoti
-                                scale: CircleScale4,
-                                strokeColor: color4,
-                                fillOpacity: 0,
-                                strokeWeight: 15//3
-                            };
-                            EpiIcon = "R_9.5";
-                        }
-                        if (7.5 < Io && 9.5 >= Io) {
-                            Star = {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                fillColor: "none",   //per gestire cerchi vuoti
-                                scale: CircleScale3,
-                                strokeColor: color3,
-                                fillOpacity: 0,
-                                strokeWeight: 15//3
-                            };
-                            EpiIcon = "R_8";
-                        }
-                        if (5.9 < Io && 7.5 >= Io) {
-                            Star = {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                fillColor: "none",   //per gestire cerchi vuoti
-                                scale: CircleScale2,
-                                strokeColor: color2,
-                                fillOpacity: 0,
-                                strokeWeight: 15//3
-                            };
-                            EpiIcon = "R_6";
-                        }
-                        if (6 > Io) {
-                            Star = {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                fillColor: "none",   //per gestire cerchi vuoti
-                                scale: CircleScale1,
-                                strokeColor: color1,
-                                fillOpacity: 0,
-                                strokeWeight: 15//3
-                            };
-                            EpiIcon = "R_4";
-                        }
-                        //--------------------------------------------  Epincenter type: Hypothetical  ---------------------------------------------------------
-                    } else if (Epicenter == "Hypothetical") {
-                        EpicenterITA = "Ipotizzata";
-                        EpicenterENG = Epicenter;
+                            if (9.5 < Io) {
+                                Star = {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    fillColor: "none",   //per gestire cerchi vuoti
+                                    scale: CircleScale4,
+                                    strokeColor: color4,
+                                    fillOpacity: 0,
+                                    strokeWeight: 15//3
+                                };
+                                EpiIcon = "R_9.5";
+                            }
+                            if (7.5 < Io && 9.5 >= Io) {
+                                Star = {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    fillColor: "none",   //per gestire cerchi vuoti
+                                    scale: CircleScale3,
+                                    strokeColor: color3,
+                                    fillOpacity: 0,
+                                    strokeWeight: 15//3
+                                };
+                                EpiIcon = "R_8";
+                            }
+                            if (5.9 < Io && 7.5 >= Io) {
+                                Star = {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    fillColor: "none",   //per gestire cerchi vuoti
+                                    scale: CircleScale2,
+                                    strokeColor: color2,
+                                    fillOpacity: 0,
+                                    strokeWeight: 15//3
+                                };
+                                EpiIcon = "R_6";
+                            }
+                            if (6 > Io) {
+                                Star = {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    fillColor: "none",   //per gestire cerchi vuoti
+                                    scale: CircleScale1,
+                                    strokeColor: color1,
+                                    fillOpacity: 0,
+                                    strokeWeight: 15//3
+                                };
+                                EpiIcon = "R_4";
+                            }
+                            //--------------------------------------------  Epincenter type: Hypothetical  ---------------------------------------------------------
+                        } else if (Epicenter == "Hypothetical") {
+                            EpicenterITA = "Ipotizzata";
+                            EpicenterENG = Epicenter;
 
-                        if (9.5 < Io) {
-                            Star = {
-                                path: EPIpathCALC,
-                                fillColor: "none",   //per gestire stelle vuote
-                                strokeColor: color4,
-                                strokeOpacity: 1,
-                                anchor: new google.maps.Point(125, 125),
-                                strokeWeight: 15,//2,
-                                scale: StarScale4
-                            };
-                            EpiIcon = "H_9.5";
-                        }
-                        ;
-                        if (7.5 < Io && 9.5 >= Io) {
-                            Star = {
-                                path: EPIpathCALC,
-                                fillColor: "none",  //per gestire stelle vuote
-                                strokeColor: color3,
-                                strokeOpacity: 1,
-                                anchor: new google.maps.Point(125, 125),
-                                strokeWeight: 15,//2,
-                                scale: StarScale3
-                            };
-                            EpiIcon = "H_8";
-                        }
-                        ;
-                        if (5.9 < Io && 7.5 >= Io) {
-                            Star = {
-                                path: EPIpathCALC,
-                                fillColor: "none",
-                                strokeColor: color2,
-                                strokeOpacity: 1,
-                                anchor: new google.maps.Point(125, 125),
-                                strokeWeight: 15,//2,
-                                scale: StarScale2
-                            };
-                            EpiIcon = "H_6";
-                        }
-                        ;
-                        if (6 > Io) {
-                            Star = {
-                                path: EPIpathCALC,
-                                fillColor: "none",  //per gestire stelle vuote
-                                strokeColor: color1,
-                                strokeOpacity: 1,
-                                anchor: new google.maps.Point(125, 125),
-                                strokeWeight: 15,//2,
-                                scale: StarScale1
-                            };
-                            EpiIcon = "H_4";
+                            if (9.5 < Io) {
+                                Star = {
+                                    path: EPIpathCALC,
+                                    fillColor: "none",   //per gestire stelle vuote
+                                    strokeColor: color4,
+                                    strokeOpacity: 1,
+                                    anchor: new google.maps.Point(125, 125),
+                                    strokeWeight: 15,//2,
+                                    scale: StarScale4
+                                };
+                                EpiIcon = "H_9.5";
+                            }
+                            ;
+                            if (7.5 < Io && 9.5 >= Io) {
+                                Star = {
+                                    path: EPIpathCALC,
+                                    fillColor: "none",  //per gestire stelle vuote
+                                    strokeColor: color3,
+                                    strokeOpacity: 1,
+                                    anchor: new google.maps.Point(125, 125),
+                                    strokeWeight: 15,//2,
+                                    scale: StarScale3
+                                };
+                                EpiIcon = "H_8";
+                            }
+                            ;
+                            if (5.9 < Io && 7.5 >= Io) {
+                                Star = {
+                                    path: EPIpathCALC,
+                                    fillColor: "none",
+                                    strokeColor: color2,
+                                    strokeOpacity: 1,
+                                    anchor: new google.maps.Point(125, 125),
+                                    strokeWeight: 15,//2,
+                                    scale: StarScale2
+                                };
+                                EpiIcon = "H_6";
+                            }
+                            ;
+                            if (6 > Io) {
+                                Star = {
+                                    path: EPIpathCALC,
+                                    fillColor: "none",  //per gestire stelle vuote
+                                    strokeColor: color1,
+                                    strokeOpacity: 1,
+                                    anchor: new google.maps.Point(125, 125),
+                                    strokeWeight: 15,//2,
+                                    scale: StarScale1
+                                };
+                                EpiIcon = "H_4";
+                            }
+                            ;
                         }
                         ;
                     }
                     ;
-                }
-                ;
 
 
-                //newtest
-                var cerchio = `<svg viewBox="0 0 250 250"   {height} {width} xmlns="http://www.w3.org/2000/svg" version="1.1"><circle cx="50" cy="50" r="40" {stroke} {widthS} {fill} /></svg>`;
-                var stella = `<svg viewBox="0 0 250 250" {height} {width} xmlns="http://www.w3.org/2000/svg" version="1.1"><path d="M 125,5 155,90 245,90 175,145 200,230 125,180 50,230 75,145 5,90 95,90 z" {fill} {stroke} {widthS} /></svg>`;
+                    //newtest
+                    var cerchio = `<svg viewBox="0 0 250 250"   {height} {width} xmlns="http://www.w3.org/2000/svg" version="1.1"><circle cx="50" cy="50" r="40" {stroke} {widthS} {fill} /></svg>`;
+                    var stella = `<svg viewBox="0 0 250 250" {height} {width} xmlns="http://www.w3.org/2000/svg" version="1.1"><path d="M 125,5 155,90 245,90 175,145 200,230 125,180 50,230 75,145 5,90 95,90 z" {fill} {stroke} {widthS} /></svg>`;
 
-                //stroke="{strokeColor}" stroke-width="{strokeWeight}" fill="{fillColor}
-                //{stroke} {stroke-width} {fill}
-                /*
-                                strokeColor diventa --->>>  stroke="#00000"
-                                strokeWeight diventa --->>  stroke-width="3"
-                                fillColor diventa ----->>>   fill="white"
-                                opacity e scale vanno sull'ICON
+                    var compiled;
+                    var coords = [];
 
-                */
-                var compiled;
-                var coords = [];
-                // coords.push(Lon);//parseFloat(Lon).toFixed(5));
-                // coords.push(Lat);//parseFloat(Lat).toFixed(5));
-
-                //4326 is just the EPSG identifier of WGS84.
-                /* target: 'map',
-                  view: new View({
-                    projection: 'EPSG:3857', //HERE IS THE VIEW PROJECTION
-                    center: [0, 0],
-                    zoom: 2
-                  }),
-                  layers: [
-                    new TileLayer({
-                      source: new TileWMS({
-                        projection: 'EPSG:4326', //HERE IS THE DATA SOURCE PROJECTION
-                        url: 'https://ahocevar.com/geoserver/wms',
-                        params: {
-                          'LAYERS': 'ne:NE1_HR_LC_SR_W_DR'
-                        }
-                      })
-                    })
-                  ]*/
-                ///TODO: AGGIUNGI QUI LE PROPERTIES CHE DEVI VISUALIZZARE NEL POPUP
-                var singleFeature = new ol.Feature({
-                    id: i,
-                    geometry: new ol.geom.Point(new ol.proj.fromLonLat([Lon, Lat])),	 //new ol.geom.Point([Lon, Lat]),
-                    title: onMouseOverText,
-                    OnClickTextIT: ""
-                });
-                //TODO:VERIIFCARE ID DELLA FEATURE //
-                //singleFeature.setId(i);
-
-                //String //pippo.concat("stroke-width=\"","3","\"")
-                //String().concat()
-                var strokeString = new String();
-                var strokeWidthString = new String();
-                var fillString = new String()
-
-                //template replace dei parametri nella stringa svg
-                if (Star.path === google.maps.SymbolPath.CIRCLE) {
-                    px = 8 * Star.scale / 8;
-                    compiled = template(cerchio, {
-                        stroke: (Star.strokeColor !== undefined) ? String().concat("stroke=\"", Star.strokeColor, '\"') : undefined,
-                        widthS: (Star.strokeWeight !== undefined) ? String().concat("stroke-width=\"", Star.strokeWeight, '\"') : undefined,
-                        fill: (Star.fillColor !== undefined) ? String().concat("fill=\"", Star.fillColor, '\"') : undefined,
-                        height: String().concat("height=\"", '5px', '\"'),
-                        width: String().concat("width=\"", '5px', '\"')
+                    ///TODO: AGGIUNGI QUI LE PROPERTIES CHE DEVI VISUALIZZARE NEL POPUP
+                    var singleFeature = new ol.Feature({
+                        id: i,
+                        geometry: new ol.geom.Point(new ol.proj.fromLonLat([Lon, Lat])),	 //new ol.geom.Point([Lon, Lat]),
+                        title: onMouseOverText,
+                        OnClickTextIT: ""
                     });
-                } else if (Star.path === EPIpathCALC) {
-                    //console.log("Star.path" + Star.path);
-                    //px =8 * Star.scale / 8;
-                    compiled = template(stella, {
-                        stroke: (Star.strokeColor !== undefined) ? String().concat("stroke=\"", Star.strokeColor, '\"') : String().concat("stroke=\"", "#000000", '\"'),
-                        //widthS: (Star.strokeWeight!== undefined) ? String().concat("stroke-width=\"",Star.strokeWeight,'\"'): String().concat("stroke-width=\"","5",'\"'),
-                        widthS: (Star.strokeWeight !== undefined) ? String().concat("stroke-width=\"", Star.strokeWeight * 2, '\"') : String().concat("stroke-width=\"", "5", '\"'),
-                        //widthS: (Star.strokeWeight!== undefined) ? String().concat("stroke-width=\"","5",'\"'): String().concat("stroke-width=\"","5",'\"'),
-                        fill: (Star.fillColor !== undefined) ? String().concat("fill=\"", Star.fillColor, '\"') : undefined,
-                        height: String().concat("height=\"", '200px', '\"'),
-                        width: String().concat("width=\"", '200px', '\"')
+                    //TODO:VERIIFCARE ID DELLA FEATURE //
+                    var strokeString = new String();
+                    var strokeWidthString = new String();
+                    var fillString = new String()
+
+                    //template replace dei parametri nella stringa svg
+                    if (Star.path === google.maps.SymbolPath.CIRCLE) {
+                        px = 8 * Star.scale / 8;
+                        compiled = template(cerchio, {
+                            stroke: (Star.strokeColor !== undefined) ? String().concat("stroke=\"", Star.strokeColor, '\"') : undefined,
+                            widthS: (Star.strokeWeight !== undefined) ? String().concat("stroke-width=\"", Star.strokeWeight, '\"') : undefined,
+                            fill: (Star.fillColor !== undefined) ? String().concat("fill=\"", Star.fillColor, '\"') : undefined,
+                            height: String().concat("height=\"", '5px', '\"'),
+                            width: String().concat("width=\"", '5px', '\"')
+                        });
+                    } else if (Star.path === EPIpathCALC) {
+                        //console.log("Star.path" + Star.path);
+                        //px =8 * Star.scale / 8;
+                        compiled = template(stella, {
+                            stroke: (Star.strokeColor !== undefined) ? String().concat("stroke=\"", Star.strokeColor, '\"') : String().concat("stroke=\"", "#000000", '\"'),
+                            //widthS: (Star.strokeWeight!== undefined) ? String().concat("stroke-width=\"",Star.strokeWeight,'\"'): String().concat("stroke-width=\"","5",'\"'),
+                            widthS: (Star.strokeWeight !== undefined) ? String().concat("stroke-width=\"", Star.strokeWeight * 2, '\"') : String().concat("stroke-width=\"", "5", '\"'),
+                            //widthS: (Star.strokeWeight!== undefined) ? String().concat("stroke-width=\"","5",'\"'): String().concat("stroke-width=\"","5",'\"'),
+                            fill: (Star.fillColor !== undefined) ? String().concat("fill=\"", Star.fillColor, '\"') : undefined,
+                            height: String().concat("height=\"", '200px', '\"'),
+                            width: String().concat("width=\"", '200px', '\"')
+                        });
+                    }
+                    ////VARIABILE DI LOG PER LEGGERE SVG DATA
+                    //console.log(compiled);
+                    //assegno la stringa svg parametrizzata
+                    var workingSvg = compiled;
+                    // console.log("STRINGA SVG PARAMETRIZZATA"+workingSvg);
+                    var stileIcone = new ol.style.Style({
+                        image: new ol.style.Icon({
+                            opacity: Star.opacity, //parametro opacity
+                            src: 'data:image/svg+xml;utf8,' + escape(workingSvg),
+                            scale: Star.scale * 1.15 //parametro scale moltiplicato per ingrandire le stelle
+                        })
                     });
+
+                    /////TODO: CON QUESTE DUE VARIABILI SI POSSONO GESTIRE I DATI DEL POPUP
+                    var OnClickTextEN = [
+                        // '<div class="IW"><div id = "IWclose"><a onclick="infowindow.close(); turnoffRow()" href="#"><img src="images/close.png" height="10px"></a></div>',  // VERSIONE PRECEDENTE DELLE IW!! PRIMA CHE GOOGLE CAMBIASSE API
+                        '<div class="iw-title quakeColor">' + 'Date: <b>' + DateLabel + '</b> Time: <b>' + TimeLabel + '</b>' + ' Epicentral Area: <b>' + Location + '</b></div>',
+                        '<div class="EQinfoIW"><br /><b>' + EpicenterENG + '</b> (Lat.: <b>' + Lat + '</b> - Lon.: <b>' + Lon + '</b>)<br /><br />',
+                        'Epicentral Intensity: <b>' + Io + '</b><br />',
+                        'Maximum Intensity: <b>' + Imax + '</b><br />',
+                        'Equivalent Magnitude: <b>' + Me + '</b><br />',
+                        'Number of Macroseismic Observations: <b>' + Npun + '</b><br /><br />',
+                        '<a href="' + QuakePage + 'EN" target="_blank"> Earthquake page </a> <br /><br /></div>',
+                        '</div>'
+                    ].join('\n');
+
+                    var OnClickTextIT = [
+                        // '<div class="IW"><div id = "IWclose"><a onclick="infowindow.close(); turnoffRow()" href="#"><img src="images/close.png" height="10px"></a></div>',    // VERSIONE PRECEDENTE DELLE IW!! PRIMA CHE GOOGLE CAMBIASSE API
+                        '<div class="iw-title quakeColor">' + 'Data: <b>' + DateLabel + '</b> Ora: <b>' + TimeLabel + '</b>' + ' Area epicentrale: <b>' + Location + '</b></div>',
+                        '<div class="EQinfoIW"><br /><b>' + EpicenterITA + '</b> (Lat.: <b>' + Lat + '</b> - Lon.: <b>' + Lon + '</b>)<br /><br />',
+                        'Intensità Epicentrale: <b>' + Io + '</b><br />',
+                        'Intensità Massima: <b>' + Imax + '</b><br />',
+                        'Magnitudo Equivalente: <b>' + Me + '</b><br />',
+                        'Numero di osservazioni macrosismiche: <b>' + Npun + '</b><br /><br />',
+                        '<a href="' + QuakePage + 'IT" target="_blank"> Pagina del terremoto </a> <br /><br /></div>',
+                        '</div>'
+                    ].join('\n');
+
+                    //ASSEGNA INFORMAZIONI CIRCA LO STYLE DELLA FEATURE E IL POPUP DICHIARATO VUOTO INIZIALMENTE.
+                    //"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20version%3D%221.1%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2240%22%20stroke%3D%22%23000000%22%20stroke-width%3D%223%22%20%20/%3E%3C/svg%3E"
+                    singleFeature.setStyle(stileIcone);
+                    singleFeature.OnClickTextIT = OnClickTextIT;
+                    // console.log(OnClickTextIT);
+
+                    markersArray[i] = new Array();
+                    markersArray[i]['Date'] = parseInt(Year + Month + Day),
+                        markersArray[i]['DateLabel'] = DateLabel,
+                        markersArray[i]['TimeLabel'] = TimeLabel,
+                        markersArray[i]['Nterr'] = Nterr,
+                        markersArray[i]['Lat'] = Lat,
+                        markersArray[i]['Lon'] = Lon,
+                        markersArray[i]['Location'] = Location,
+                        markersArray[i]['Country'] = Country,
+                        markersArray[i]['Io'] = Io,
+                        markersArray[i]['Year'] = Year,
+                        markersArray[i]['Month'] = Month,
+                        markersArray[i]['Day'] = Day,
+                        markersArray[i]['Hour'] = Hour,
+                        markersArray[i]['Minu'] = Minu,
+                        markersArray[i]['Sec'] = Sec,
+                        markersArray[i]['Me'] = Me,
+                        markersArray[i]['Imax'] = Imax,
+                        markersArray[i]['Zone'] = Zone,
+                        markersArray[i]['Npun'] = Npun,
+                        markersArray[i]['FlagFalse'] = FlagFalse,
+                        markersArray[i]['Level'] = EQlevel,
+                        markersArray[i]['Note'] = Reliability,
+                        markersArray[i]['EpiType'] = Epicenter,
+                        // markersArray[i]['EpiIcon'] = EpiIcon,
+                        markersArray[i]['EpiIcon'] = EpiIcon,
+                        markersArray[i]['Marker'] = singleFeature
+
+                    openPopupSpider(markersArray[i]['Marker'], OnClickTextEN, OnClickTextIT, markersArray[i]['Nterr'], markersArray[i]['Lat'], markersArray[i]['Lon']);
                 }
-                ////VARIABILE DI LOG PER LEGGERE SVG DATA
-                //console.log(compiled);
-                //assegno la stringa svg parametrizzata
-                var workingSvg = compiled;
-                // console.log("STRINGA SVG PARAMETRIZZATA"+workingSvg);
-                var stileIcone = new ol.style.Style({
-                    image: new ol.style.Icon({
-                        opacity: Star.opacity, //parametro opacity
-                        src: 'data:image/svg+xml;utf8,' + escape(workingSvg),
-                        scale: Star.scale * 1.15 //parametro scale moltiplicato per ingrandire le stelle
-                    })
-                });
-
-                /////TODO: CON QUESTE DUE VARIABILI SI POSSONO GESTIRE I DATI DEL POPUP
-                var OnClickTextEN = [
-                    // '<div class="IW"><div id = "IWclose"><a onclick="infowindow.close(); turnoffRow()" href="#"><img src="images/close.png" height="10px"></a></div>',  // VERSIONE PRECEDENTE DELLE IW!! PRIMA CHE GOOGLE CAMBIASSE API
-                    '<div class="iw-title quakeColor">' + 'Date: <b>' + DateLabel + '</b> Time: <b>' + TimeLabel + '</b>' + ' Epicentral Area: <b>' + Location + '</b></div>',
-                    '<div class="EQinfoIW"><br /><b>' + EpicenterENG + '</b> (Lat.: <b>' + Lat + '</b> - Lon.: <b>' + Lon + '</b>)<br /><br />',
-                    'Epicentral Intensity: <b>' + Io + '</b><br />',
-                    'Maximum Intensity: <b>' + Imax + '</b><br />',
-                    'Equivalent Magnitude: <b>' + Me + '</b><br />',
-                    'Number of Macroseismic Observations: <b>' + Npun + '</b><br /><br />',
-                    '<a href="' + QuakePage + 'EN" target="_blank"> Earthquake page </a> <br /><br /></div>',
-                    '</div>'
-                ].join('\n');
-
-                var OnClickTextIT = [
-                    // '<div class="IW"><div id = "IWclose"><a onclick="infowindow.close(); turnoffRow()" href="#"><img src="images/close.png" height="10px"></a></div>',    // VERSIONE PRECEDENTE DELLE IW!! PRIMA CHE GOOGLE CAMBIASSE API
-                    '<div class="iw-title quakeColor">' + 'Data: <b>' + DateLabel + '</b> Ora: <b>' + TimeLabel + '</b>' + ' Area epicentrale: <b>' + Location + '</b></div>',
-                    '<div class="EQinfoIW"><br /><b>' + EpicenterITA + '</b> (Lat.: <b>' + Lat + '</b> - Lon.: <b>' + Lon + '</b>)<br /><br />',
-                    'Intensità Epicentrale: <b>' + Io + '</b><br />',
-                    'Intensità Massima: <b>' + Imax + '</b><br />',
-                    'Magnitudo Equivalente: <b>' + Me + '</b><br />',
-                    'Numero di osservazioni macrosismiche: <b>' + Npun + '</b><br /><br />',
-                    '<a href="' + QuakePage + 'IT" target="_blank"> Pagina del terremoto </a> <br /><br /></div>',
-                    '</div>'
-                ].join('\n');
-
-                //ASSEGNA INFORMAZIONI CIRCA LO STYLE DELLA FEATURE E IL POPUP DICHIARATO VUOTO INIZIALMENTE.
-                //"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20version%3D%221.1%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2240%22%20stroke%3D%22%23000000%22%20stroke-width%3D%223%22%20%20/%3E%3C/svg%3E"
-                singleFeature.setStyle(stileIcone);
-                singleFeature.OnClickTextIT = OnClickTextIT;
-                // console.log(OnClickTextIT);
-
-                markersArray[i] = new Array();
-                markersArray[i]['Date'] = parseInt(Year + Month + Day),
-                    markersArray[i]['DateLabel'] = DateLabel,
-                    markersArray[i]['TimeLabel'] = TimeLabel,
-                    markersArray[i]['Nterr'] = Nterr,
-                    markersArray[i]['Lat'] = Lat,
-                    markersArray[i]['Lon'] = Lon,
-                    markersArray[i]['Location'] = Location,
-                    markersArray[i]['Country'] = Country,
-                    markersArray[i]['Io'] = Io,
-                    markersArray[i]['Year'] = Year,
-                    markersArray[i]['Month'] = Month,
-                    markersArray[i]['Day'] = Day,
-                    markersArray[i]['Hour'] = Hour,
-                    markersArray[i]['Minu'] = Minu,
-                    markersArray[i]['Sec'] = Sec,
-                    markersArray[i]['Me'] = Me,
-                    markersArray[i]['Imax'] = Imax,
-                    markersArray[i]['Zone'] = Zone,
-                    markersArray[i]['Npun'] = Npun,
-                    markersArray[i]['FlagFalse'] = FlagFalse,
-                    markersArray[i]['Level'] = EQlevel,
-                    markersArray[i]['Note'] = Reliability,
-                    markersArray[i]['EpiType'] = Epicenter,
-                    // markersArray[i]['EpiIcon'] = EpiIcon,
-                    markersArray[i]['EpiIcon'] = EpiIcon,
-                    //**************TODO:RIPRISTINARE IL MARKER e la virgola alla riga sopra!!! *******/
-                    markersArray[i]['Marker'] = singleFeature
-//************************************TODO:GESTIONE DESERIALIZZAZIONE+GEOJSON***********************************************************//
-//                 var format = new ol.format.GeoJSON();
-//                 // provare anche writeFeatureObject
-//                 //var geoJsonObj = format.writeFeature(singleFeature, { dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-//                 var geoJsonObj = format.writeFeatureObject(markersArray[i]['Marker']); //,{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-//                 geoJsonObj.properties.Style=markersArray[i]['Marker'].getStyle();                   //e' necessario assegnare due properties altrimenti non riesce
-//                 geoJsonObj.properties.OnClickTextIT = markersArray[i]['Marker'].OnClickTextIT;
-//                 // {"type":"Feature","geometry":{"type":"Point","coordinates":[27.167,36.833]},"properties":{"id":1412,"title":"554 – 558","OnClickTextIT":""}}
-//                 ///geoJSONArray.push(geoJsonObj);
-//                 console.log(geoJsonObj);
-//                 //{"type":"Feature","geometry":{"type":"Point","coordinates":[33.398,34.943]},"properties":{"id":1727,"title":"1491 04 24","OnClickTextIT":""},"Style":{"geometry_":null,"fill_":null,"image_":{"opacity_":1,"rotateWithView_":false,"rotation_":0,"scale_":0.092,"scaleArray_":[0.092,0.092],"displacement_":[0,0],"anchor_":[0.5,0.5],"normalizedAnchor_":null,"anchorOrigin_":"top-left","anchorXUnits_":"fraction","anchorYUnits_":"fraction","crossOrigin_":null,"color_":null,"iconImage_":{"disposed":false,"pendingRemovals_":null,"dispatching_":null,"listeners_":null,"hitDetectionImage_":null,"image_":{},"canvas_":{},"color_":null,"unlisten_":null,"imageState_":0,"size_":null,"src_":"data:image/svg+xml;utf8,%3Csvg%20viewBox%3D%220%200%20250%20250%22%20height%3D%22200px%22%20width%3D%22200px%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20version%3D%221.1%22%3E%3Cpath%20d%3D%22M%20125%2C5%20155%2C90%20245%2C90%20175%2C145%20200%2C230%20125%2C180%2050%2C230%2075%2C145%205%2C90%2095%2C90%20z%22%20fill%3D%22%23f93a00%22%20stroke%3D%22%23000000%22%20stroke-width%3D%2210%22%20/%3E%3C/svg%3E"},"offset_":[0,0],"offsetOrigin_":"top-left","origin_":null,"size_":null},"renderer_":null,"stroke_":null,"text_":null},"OnClickTextIT":"<div class=\"iw-title quakeColor\">Data: <b>1491 04 24</b> Ora: <b>17:00</b> Area epicentrale: <b>Cyprus</b></div>\n<div class=\"EQinfoIW\"><br /><b>Epicentro calcolato</b> (Lat.: <b>34.943</b> - Lon.: <b>33.398</b>)<br /><br />\nIntensità Epicentrale: <b>9</b><br />\nIntensità Massima: <b>9</b><br />\nMagnitudo Equivalente: <b>6.5</b><br />\nNumero di osservazioni macrosismiche: <b>10</b><br /><br />\n<a href=\"http://localhost/quake.php?M2375IT\" target=\"_blank\"> Pagina del terremoto </a> <br /><br /></div>\n</div>"}*/
-//                 //console.log(JSON.stringify(geoJsonObj))
-//                 openPopupSpider(geoJsonObj, OnClickTextEN, OnClickTextIT, markersArray[i]['Nterr'], markersArray[i]['Lat'], markersArray[i]['Lon']);
-//                 geoJSONArray.features.push(geoJsonObj);
-//************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
-
-                /*const workingIconFeature = new ol.Feature({
-                geometry: new ol.geom.Point([-1, -1])
-                });
-
-                const workingSvg = `<svg width="4cm" height="4cm" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" version="1.1"><path d="M 125,5 155,90 245,90 175,145 200,230 125,180 50,230 75,145 5,90 95,90 z" fill="white" stroke="black" stroke-width="3" /></svg>`;
-
-                const workingStyle = new ol.style.Style({
-                  image: new ol.style.Icon({
-                    opacity: 1,
-                    src: 'data:image/svg+xml;utf8,' + escape(workingSvg),
-                    scale: 1
-                  })
-                });
-
-                workingIconFeature.setStyle(workingStyle);*/
-
-
-                // Call function that opens pop up window with quake info
-                //console.log('chiamata a openPopupSpider' );
-                //**************TODO:RIPRISTINARE riGA SOTTO!!! *******/
-                openPopupSpider(markersArray[i]['Marker'], OnClickTextEN, OnClickTextIT, markersArray[i]['Nterr'], markersArray[i]['Lat'], markersArray[i]['Lon']);
             }
-        }
 
-        console.log("Caricamento quakes finito");
-
-//************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
-//                 console.log("markersArray in memoria chiamata a url di test per save json...")
-//                 console.log(markersArray[0]);
-//                 console.log(JSON.stringify(markersArray[0]));
-//
-//                 var dataInput = { data: markersArray[0] };
-//                 console.log(dataInput);
-                ///TODO: DESERIALIZZAZIONE QUANDO JSON.stringify restituisce []
-
-                // console.log("tentativo disperato deserializzazione senza markers: your_objectToStrf= var your_objectToStrf = Object.assign({}, markersArray[0]); ");
-                // var your_objectToStrf = Object.assign({}, markersArray[0]);
-                // console.log("your_objectToStrf=>" + JSON.stringify(your_objectToStrf));
-                // var yourStrTo_objectAgain= JSON.parse(JSON.stringify(your_objectToStrf));
-                // console.log("yourStrTo_objectAgain=>");
-                // console.log(yourStrTo_objectAgain);
-                /*tentativo disperato: your_objectToStrf= funziona ma senza il marker che da riferimento circolare altrimenti.
-index.js:656 {"Date":10000100,"DateLabel":"1000 01 -","TimeLabel":"-","Nterr":"00001","Lat":"46.000","Lon":"14.500","Location":"Yugoslavia","Country":"Slovenia","Io":0,"Year":1000,"Month":"01","Day":"00","Hour":0,"Minu":0,"Sec":0,"Me":0,"Imax":0,"Zone":"ITA","Npun":0,"FlagFalse":true,"Level":"S","Note":"F","EpiType":"-","EpiIcon":"F"}*/
-
-                // $.ajax({
-                //     url: '/test',  //http://localhost/test => Route::post('/test','PhotoController@saveJson');
-                //     type: 'POST',
-                //     dataType: 'json',
-                //     contentType: 'json',
-                //     data:  JSON.stringify(your_objectToStrf),
-                //     contentType: 'application/json; charset=utf-8',
-                //     success: function(data){
-                //         if(data.success == true){
-                //             //alert('success');
-                //             console.log("success saved markersArray.");
-                //         }
-                //     },
-                //     error: function (jqXHR, textStatus, errorThrown) {
-                //         console.error(textStatus);
-                //         console.error(errorThrown);
-                //     }
-                //
-                // });
-//************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
+            console.log("Caricamento quakes finito");
 
 
 
-    } //end parseQuakes
+        }); //end parseQuakes
+
+	}
+
+//    this.parseQuakes =
 
 
 
@@ -1285,6 +1201,8 @@ function ResetMap(){
 		LonW: parseFloat(document.getElementById('LonW').value),
 		LonE: parseFloat(document.getElementById('LonE').value),
 	});
+    console.log("CARICAMENTO CREAZIONE MAPPA DOPO LO SHOWQUAKES");
+    creazioneMappa(); //TODO: AGGIUNTO DAL MANAJAX
 	// resizeMapIndex() ;
 	// spiderfy();
 

@@ -24,6 +24,7 @@ Route::get('/cfti5', function () {
 });
 //PAGINA TERREMOTI MODIFICATA CACHING STORAGE
 Route::get('/cfti5CS', function () {
+    Log::info("Caricamento Resources\\Views\\indexCFTI5CStorage.blade.php...");
     return view('indexCFTI5CStorage');
 });
 
@@ -37,45 +38,32 @@ Route::get('/loadQuakesDataFromCache','PhotoController@loadQuakesDataFromCache')
 Route::post('/saveQuakesData','PhotoController@saveQuakesData');
 Route::post('/saveQuakesGeoJSONData','PhotoController@saveQuakesGeoJSONData');
 Route::get('/loadGeoJSONDataFromCache','PhotoController@loadGeoJSONDataFromCache');
+
+Route::get('/indexQuakesXML','PhotoController@indexQuakesXML'); //gestione xml quakes
+Route::get('/photoLoadXML','PhotoController@indexLoadXML');
 //TODO: effettuare il get di geoJSON ma poi passare al blade in fase di caricamento iniziare i dati
 /**************TODO:GESTIONE TERREMOTI BEGIN ************************/
-
-
-Route::get('/indexQuakesXML','PhotoController@indexQuakesXML');
-
-
-
-Route::get('/photo','PhotoController@index');
-
-Route::get('/photoLoadXML','PhotoController@indexLoadXML');
-
-
-//PRIMA CHIAMATA DATI CACHATI
-Route::get('/photoLoadXML2','PhotoController@indexLoadXML2');
-
-
+//PRIMA CHIAMATA DATI CACHATI DELLE LOCALITY TEST indexV3LocFull.blade
 Route::get('/indexV3LocFull3', function () {
     $result = (new PhotoController())->indexLocalityLoad();
-
     $arrOutput = json_decode($result->content(), TRUE);  //decodifica il json della risposta
-
     // Log::info( $arrOutput[0]["Loc"] ); //dato presente e verificato sui LOG
     Log::info( "Route@indexV3LocFull3 TOTALE ELEMENTI RECUPERATI DAL CONTROLLER:" . count($arrOutput[0]) ); //dato presente e verificato sui LOG
-    Log::info("Route@indexV3LocFull3 ELEMENT ARRAY CARICATO MAPPATURA VIEW LOADING...");
-    return view('indexV3LocFull', ['alldata' => $arrOutput[0]]);
+    Log::info("Route@indexV3LocFull3 ELEMENT ARRAY CARICATO MAPPATURA Resources\\Views\\indexV3LocFull.blade.php...");
+    return view('indexV3LocFull', ['alldata' => $arrOutput[0]]); //MAPPING sul blade variabile alldata es.  markersCoords = {{ Illuminate\Support\Js::from($alldata, true ) }};
 });
 
 
+//altri test
+Route::get('/photoLoadXML2','PhotoController@indexLocalityLoadXML');
+Route::get('/photo','PhotoController@index');
+
 
 Route::get('/indexV3LocFull2', function () {
-    $result = (new PhotoController())->indexLoadXML2();
-
+    $result = (new PhotoController())->indexLocalityLoadXML();
     //RECUPERA IL CONTENT DEL JSON DI RISPOSTA e deve essere ASSOCIATIVO per prendere il LOC
     $arrOutput = json_decode($result->content(), TRUE);  //decodifica il json della risposta
-
     // Log::info( $arrOutput[0]["Loc"] ); //dato presente e verificato sui LOG
-
-
     function filter($item): bool
     {
         return ($item['maxint'] >= 0 );
@@ -174,15 +162,12 @@ Route::get('/indexV3LocFull2', function () {
         } else if ($element->maxint == -2) {
             $element->maxintROM = "-";
         }
-
         //$element->key = $key; //SE SI VUOLE AGGIUNGERE LA CHIAVE
         //aggiungo elemento nell'array
         $elementArray[] = $element;
     }
-
     //['varibileNellaPagina' => variabileQuiLocale]
     //CHIAMA LA PAGINA indexV3LocFull.blade.php passando nella varibile alldata il contenuto di $elementArray sopra valorizzato. Ovviamente per il PHP variabile letta con $alldata
-
     //Log::info($elementArray); valorizzazione dei log su disco
     Log::info("ELEMENT ARRAY CARICATO MAPPATURA VIEW LOADING...");
     return view('indexV3LocFull', ['alldata' => $elementArray]);

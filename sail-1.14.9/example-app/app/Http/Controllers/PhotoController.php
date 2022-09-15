@@ -236,7 +236,66 @@ class PhotoController extends Controller
     }
 
 
-    public function indexLoadXML2()
+
+
+
+/********************************************TODO: GESTIONE XML FILES****************************************************************************/
+    /*
+     * 1) ritorna xml puro
+     * 2) cachare xml su rediis
+     * 3) ritorna oggetto cachato
+     * 4)   IN GENERALE PRIMO STEP TUTTO QUELLO CHE ERA LEGGI DA JS e prendi XML diventa prendi da un controller CACHE
+     * 4.1) OTTIMIZZAZIONE ULTERIORE tutte le trasformazioni fatte sul JS dopo la lettura XML vengono quindi effettuate da PHP
+     * 5) Si potrebbe prevedere un save in cache di un array preelaborato e fare un check su rediis se già preesistente non serve rifare l'elaborazione dell'array ma basta utilizzare
+     * quanto gia' presente e cachato.
+     */
+    public function indexQuakesXML(){
+
+        //TODO: chiamata esterna di esempio e trasforma in output il risultato START //
+
+//        $response = Http::withMiddleware(
+//            Middleware::mapResponse(function (ResponseInterface $response) {
+//                $header = $response->getHeader('Content-Type: application/xml');
+//
+//                // ...
+//
+//                return $response;
+//            })
+//        )->get('https://api.namecheap.com/xml.response?ApiUser=(username)&ApiKey=(apikey)&UserName(username)&ClientIp=(ip)');
+//        Log::info($response->status());
+//        Log::info($response->body());
+//        //TODO:sostituisci il body con il file richiesto
+//        $xml = simplexml_load_string($response->body(),'SimpleXMLElement',LIBXML_NOCDATA);
+//        header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
+//        Log::info($xml->asXML());
+//        echo $xml->asXML();
+
+        //TODO: chiamata esterna di esempio  e trasforma in output il risultato END //
+
+        Log::info('indexQuakesXML@@Attempt display data From REDIS server START');
+        $listXML = Cache::rememberForever('QuakesXMLForever', function () {
+            Log::info('indexQuakesXML@@LOADING XMLFile FROM DISK STARTED...........');
+            $objXmlDocument = simplexml_load_file("QuakeList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
+            if ($objXmlDocument === FALSE) {
+                echo "There were errors parsing the XML file.\n";
+                foreach (libxml_get_errors() as $error) {
+                    echo $error->message;
+                }
+                exit;
+            }
+            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
+            //Log::info($objXmlDocument->asXML()); logging
+            return $objXmlDocument->asXML();
+        });
+        Log::info('indexQuakesXML@@Attempt display data From REDIS server END returning data');
+        header('Content-Type: application/xml');
+        // Log::info($listXML); recupero XML
+        //echo $xml->asXML();
+        return $listXML;
+        //return $xml->asXML();
+    }
+
+    public function indexLocalityLoadXML()
     {
         Log::info('@@Attempt display data From REDIS server START');
         $listXML = Cache::rememberForever('LocListForever', function () {
@@ -263,59 +322,6 @@ class PhotoController extends Controller
         Log::info('@@Attempt display data From REDIS server END ');
         Log::info("@@Data readed from XMLFILE/cache count N:" . count($listXML["Loc"]));
         return response()->json([$listXML]);
-    }
-
-    /*
-     * 1) ritorna xml puro
-     * 2) cachare xml su rediis
-     * 3) ritorna oggetto cachato
-     * 4)   IN GENERALE PRIMO STEP TUTTO QUELLO CHE ERA LEGGI DA JS e prendi XML diventa prendi da un controller CACHE
-     * 4.1) OTTIMIZZAZIONE ULTERIORE tutte le trasformazioni fatte sul JS dopo la lettura XML vengono quindi effettuate da PHP
-     * 5) Si potrebbe prevedere un save in cache di un array preelaborato e fare un check su rediis se già preesistente non serve rifare l'elaborazione dell'array ma basta utilizzare
-     * quanto gia' presente e cachato.
-     */
-    public function indexQuakesXML(){
-
-        //TODO: chiamata esterna di esempio //
-
-        //        $response = Http::withMiddleware(
-//            Middleware::mapResponse(function (ResponseInterface $response) {
-//                $header = $response->getHeader('Content-Type: application/xml');
-//
-//                // ...
-//
-//                return $response;
-//            })
-//        )->get('https://api.namecheap.com/xml.response?ApiUser=(username)&ApiKey=(apikey)&UserName(username)&ClientIp=(ip)');
-//        Log::info($response->status());
-//        Log::info($response->body());
-//        //TODO:sostituisci il body con il file richiesto
-//        $xml = simplexml_load_string($response->body(),'SimpleXMLElement',LIBXML_NOCDATA);
-//        header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
-//        Log::info($xml->asXML());
-//        echo $xml->asXML();
-
-        Log::info('indexQuakesXML@@Attempt display data From REDIS server START');
-        $listXML = Cache::rememberForever('QuakesXMLForever', function () {
-            Log::info('indexQuakesXML@@LOADING XMLFile FROM DISK STARTED...........');
-            $objXmlDocument = simplexml_load_file("QuakeList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
-            if ($objXmlDocument === FALSE) {
-                echo "There were errors parsing the XML file.\n";
-                foreach (libxml_get_errors() as $error) {
-                    echo $error->message;
-                }
-                exit;
-            }
-            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
-            //Log::info($objXmlDocument->asXML()); logging
-            return $objXmlDocument->asXML();
-        });
-        Log::info('indexQuakesXML@@Attempt display data From REDIS server END returning data');
-        header('Content-Type: application/xml');
-        // Log::info($listXML); recupero XML
-        //echo $xml->asXML();
-        return $listXML;
-        //return $xml->asXML();
     }
 
 
@@ -448,6 +454,8 @@ class PhotoController extends Controller
 //    {
 //        return ($item['maxint'] >= 0 );
 //    }
+
+
 
 
 

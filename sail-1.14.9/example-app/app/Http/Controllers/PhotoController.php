@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\View;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Void_;
 use stdClass;
@@ -19,6 +22,7 @@ use stdClass;
 
 class PhotoController extends Controller
 {
+
     //url mapped /test
     function saveJson(Request $request)
     {
@@ -32,6 +36,38 @@ class PhotoController extends Controller
         echo json_encode(array('success'=>'true'));
     }
 /**************TODO:GESTIONE TERREMOTI BEGIN ************************/
+
+    /** caricamento singola url http://localhost/quake.php?02062IT
+     *  ULR querystring recuperata per verificare ID -> chiamare altro controller che recupera il file XML cachato
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    function singleQuakeLoading(Request $request)
+    {
+    //      $request->query->keys()[0]
+    //      dump($request->query->all());
+    //      dump($request->query->keys()[0]);
+    //      dump(substr($request->query->keys()[0], 0, -2));
+    //        $nterrCodeQuake =substr($request->query->keys()[0], 0, -2); //rimuove gli ultimi due caratteri della lingua
+    //        Log::info($request->query->all());
+        return view('quake');
+    }
+
+    /** caricamento singola url http://localhost/quake.php?02062IT
+     *  ULR querystring recuperata per verificare ID -> chiamare altro controller che recupera il file XML cachato
+     * @return
+     */
+    function quakeSourcesLoading($nterrId)
+    {
+        Log::info("PhotoController@quakeSourcesLoading called START");
+        Log::info($nterrId);
+        //Chiamata esterna ad un altro modulo presente nel controller
+        $resultQuakeSourcesXML = (new PhotoController())->loadQuakeSources($nterrId);;
+        Log::info("PhotoController@quakeSourcesLoading called END... calling the View('quake')");
+        Log::info($resultQuakeSourcesXML);
+        return $resultQuakeSourcesXML;
+    }
+
     /**Salvataggio dei dati di base dei terremoti che dall'XML sono stati elaborati in JS nell'oggetto markersArray e vengono salvati [la classe MARKER viene gestita separatamente]
      * L'informazione viene anche cachata.
      * {"Date":10000100,"DateLabel":"1000 01 -","TimeLabel":"-","Nterr":"00001","Lat":"46.000","Lon":"14.500","Location":"Yugoslavia","Country":"Slovenia","Io":0,"Year":1000,"Month":"01","Day":"00","Hour":0,"Minu":0,"Sec":0,"Me":0,"Imax":0,"Zone":"ITA","Npun":0,"FlagFalse":true,"Level":"S","Note":"F","EpiType":"-","EpiIcon":"F"}
@@ -114,80 +150,27 @@ class PhotoController extends Controller
             return $objXmlDocument->asXML();
         });
         Log::info('loadQuakesXML@@Attempt display data From REDIS server END returning data');
-        header('Content-Type: application/xml');
-        return $listXML;
+        //header('Content-Type: application/xml');
+        return response()->make($listXML)->header("Content-Type", "application/xml");
+        //return $listXML;
     }
-
-/**************TODO:GESTIONE TERREMOTI  END************************/
-
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @return mixed Restituisce XML del singolo terremoto e cacha il file sempre
+     * (possibilità di creare un futuro uno script di warmUp della cache che precarica tutta la dir)
+     *  FILE di esempio: parsePQData./quakeSources/09698.xml 09698 è il parametro nterrCode passato cosi -
+     * $nterrCodeQuake =substr($request->query->keys()[0], 0, -2); //rimuove gli ultimi due caratteri della lingua
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function index()
-    {
-        $photosValues = Cache::get('globals');
-        if (isset($photosValues)) {
-            echo "Display data From REDIS server<br>";
-            $photos = json_decode($photosValues);
-            //dump($photos);
-            Log::info('Display data From REDIS server');
-            Log::info($photos);
-            echo "PHOTOS N:". count($photos);
-        }
-        else {
-            echo "Display data From REST API server<br>"; //https://jsonplaceholder.typicode.com/photos
-            $response = Http::withOptions(["verify" => false])->get('https://jsonplaceholder.typicode.com/photos');
-            //$response = Http::withOptions(["verify" => false])->withHeaders(["Cache-Control: no-cache",])->get('https://jsonplaceholder.typicode.com/photos');
-
-            Log::info('Display data From REST API server');
-            Log::info($response);
-            Log::info($response->body());
-            //var_dump($response->body());
-
-
-
-            $photos = json_decode($response->body());
-
-            //mostra a video l'output dei 5000 elementi
-            //dump($photos);
-
-            Cache::forever('globals', json_encode($photos));
-
-
-            //Http::post($url,$fields)::withHeaders(["Authorization: Bearer $paystack_key","Cache-Control: no-cache",])::withOptions(["verify"=>false]);
-
-            /*Cache::forever('key', 'value');
-            Given that, I would change your code to something like the following:
-            cache()->forever('globals', json_encode(['foo' => 'bar']));*/
-
-            echo "STATUS:" . strval($response->status()) . "<br>";
-            echo "OK:" . strval($response->ok()) . "<br>";
-            echo "SUCCESSFUL:" . strval($response->successful()) . "<br>";
-            echo "PHOTOS N:". count($photos);
-        }
-    }
-
-    public function indexLoadXML()
-    {
-        $locListValues = Cache::get('LocList');
-        if (isset($locListValues)) {
-            echo "Display data From REDIS server<br>";
-            $locListArr =  json_decode($locListValues,true);
-            //dump($photos);
-            Log::info('Display data From REDIS server');
-            //Log::info(print_r($locListArr));
-            echo "LOCLIST N:" . count($locListArr["Loc"]); // $locListArr["Loc"]
-            dump($locListArr["Loc"][0]);
-            dump($locListArr["Loc"][1]);
-        } else {
-            echo "Display data reading xml file<br>";
-
-            //$objXmlDocument = simplexml_load_file("LocList.xml");
-            $objXmlDocument = simplexml_load_file("LocList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
-
+    public function loadQuakeSources($nterrCode){
+        $keyNterrSingleQuake= "loadQuakeSources_" . $nterrCode;
+        Log::info('loadQuakeSources@@Attempt display data From REDIS server START key:' . $keyNterrSingleQuake);
+        $listXML = Cache::rememberForever($keyNterrSingleQuake, function () use($keyNterrSingleQuake, $nterrCode)  { //NB. PASSAGGIO PARAMETRI ALLA FUNZIONE DI CALLBACK
+            Log::info('loadQuakeSources@@LOADING XMLFile FROM DISK STARTED...........key:' . $keyNterrSingleQuake);
+            $fullPath =$_SERVER["DOCUMENT_ROOT"] . '/quakeSources/' . $nterrCode . '.xml';  //parsePQData./quakeSources/09698.xml
+            Log::info('loadQuakeSources@@LOADING XMLFile FROM DISK ' . $fullPath . '...........key:' . $keyNterrSingleQuake);
+//            $xmlFileData = file_get_contents("xml->{$fullPath}");
+            $objXmlDocument = simplexml_load_file($fullPath, "SimpleXMLElement", LIBXML_NOCDATA);
             if ($objXmlDocument === FALSE) {
                 echo "There were errors parsing the XML file.\n";
                 foreach (libxml_get_errors() as $error) {
@@ -195,51 +178,16 @@ class PhotoController extends Controller
                 }
                 exit;
             }
+            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
+            return $objXmlDocument->asXML();
+        });
+        Log::info('loadQuakesXML@@Attempt display data From REDIS server END returning data key:' . $keyNterrSingleQuake);
 
-            //Convert the SimpleXMLElement Object Into Its JSON Representation
-            $objJsonDocument = json_encode($objXmlDocument);
-            //Decode the JSON String Into an Array
-            $arrOutput = json_decode($objJsonDocument, TRUE);
-
-            echo "XMLdata count N:" . count($arrOutput["Loc"]);
-
-            dump($arrOutput["Loc"][0]);
-            dump($arrOutput["Loc"][1]);
-            //dump($arrOutput["Loc"]);// ci mette un po'
-
-            Cache::forever('LocList', $objJsonDocument);
-            echo "STATUS:CACHED";
-
-//        $filteredLocality = array_filter($arrOutput["Loc"], 'filter');
-//        $elementArray = array();
-//
-//        //LOOP ATTRAVERSO LA CHIAVE PER INDICE DI ARRAY ASSOCIATIVO
-//        foreach ($filteredLocality as $key => $value) {
-//            //echo $key;
-//            $convertCoordinates = [];
-//            array_push($convertCoordinates, (float)$value["lon_wgs84"], (float)$value["lat_wgs84"]); //aggiunge 2 elementi all'array
-//            //$coordinates = json_encode($convertCoordinates); //questa istruzione converte in stringa non andava bene.
-//
-//
-//            $element = new stdClass();
-//            $element->name = $value["nazione"];
-//            $element->description = $value["desloc_cfti"];
-//            $element->coordinates = $convertCoordinates;//$coordinates;
-//            $element->url = "http://www.google.it";
-//            //$element->key = $key; //SE SI VUOLE AGGIUNGERE LA CHIAVE
-//            //aggiungo elemento nell'array
-//            $elementArray[] = $element;
-//            //DEBUG INFORMAZIONI
-//            //print_r($elementArray);
-//        }
-        }
+        ///TODO: SOLUZIONE CHARSET DA APPLICARE OVUNQUE***/
+        /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
+        return response()->make($listXML)->header("Content-Type", "application/xml");
     }
 
-
-
-
-
-/********************************************TODO: GESTIONE XML FILES****************************************************************************/
     /*
      * 1) ritorna xml puro
      * 2) cachare xml su rediis
@@ -288,13 +236,21 @@ class PhotoController extends Controller
             return $objXmlDocument->asXML();
         });
         Log::info('indexQuakesXML@@Attempt display data From REDIS server END returning data');
-        header('Content-Type: application/xml');
-        // Log::info($listXML); recupero XML
-        //echo $xml->asXML();
-        return $listXML;
-        //return $xml->asXML();
+//        header('Content-Type: application/xml');
+//        return $listXML;
+        ///TODO: SOLUZIONE CHARSET DA APPLICARE OVUNQUE***/
+        /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
+        return response()->make($listXML)->header("Content-Type", "application/xml");
     }
 
+/**************TODO:GESTIONE TERREMOTI  END************************/
+
+/********************************************TODO: GESTIONE ALTRI XML FILES TESTING****************************************************************************/
+
+
+    /**
+     * @return \Illuminate\Http\JsonResponse Ritorna una rappresentazione JSON convertita come array associativo partendo dal file xml.
+     */
     public function indexLocalityLoadXML()
     {
         Log::info('@@Attempt display data From REDIS server START');
@@ -454,6 +410,126 @@ class PhotoController extends Controller
 //    {
 //        return ($item['maxint'] >= 0 );
 //    }
+
+
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $photosValues = Cache::get('globals');
+        if (isset($photosValues)) {
+            echo "Display data From REDIS server<br>";
+            $photos = json_decode($photosValues);
+            //dump($photos);
+            Log::info('Display data From REDIS server');
+            Log::info($photos);
+            echo "PHOTOS N:". count($photos);
+        }
+        else {
+            echo "Display data From REST API server<br>"; //https://jsonplaceholder.typicode.com/photos
+            $response = Http::withOptions(["verify" => false])->get('https://jsonplaceholder.typicode.com/photos');
+            //$response = Http::withOptions(["verify" => false])->withHeaders(["Cache-Control: no-cache",])->get('https://jsonplaceholder.typicode.com/photos');
+
+            Log::info('Display data From REST API server');
+            Log::info($response);
+            Log::info($response->body());
+            //var_dump($response->body());
+
+
+
+            $photos = json_decode($response->body());
+
+            //mostra a video l'output dei 5000 elementi
+            //dump($photos);
+
+            Cache::forever('globals', json_encode($photos));
+
+
+            //Http::post($url,$fields)::withHeaders(["Authorization: Bearer $paystack_key","Cache-Control: no-cache",])::withOptions(["verify"=>false]);
+
+            /*Cache::forever('key', 'value');
+            Given that, I would change your code to something like the following:
+            cache()->forever('globals', json_encode(['foo' => 'bar']));*/
+
+            echo "STATUS:" . strval($response->status()) . "<br>";
+            echo "OK:" . strval($response->ok()) . "<br>";
+            echo "SUCCESSFUL:" . strval($response->successful()) . "<br>";
+            echo "PHOTOS N:". count($photos);
+        }
+    }
+
+    public function indexLoadXML()
+    {
+        $locListValues = Cache::get('LocList');
+        if (isset($locListValues)) {
+            echo "Display data From REDIS server<br>";
+            $locListArr =  json_decode($locListValues,true);
+            //dump($photos);
+            Log::info('Display data From REDIS server');
+            //Log::info(print_r($locListArr));
+            echo "LOCLIST N:" . count($locListArr["Loc"]); // $locListArr["Loc"]
+            dump($locListArr["Loc"][0]);
+            dump($locListArr["Loc"][1]);
+        } else {
+            echo "Display data reading xml file<br>";
+
+            //$objXmlDocument = simplexml_load_file("LocList.xml");
+            $objXmlDocument = simplexml_load_file("LocList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
+
+            if ($objXmlDocument === FALSE) {
+                echo "There were errors parsing the XML file.\n";
+                foreach (libxml_get_errors() as $error) {
+                    echo $error->message;
+                }
+                exit;
+            }
+
+            //Convert the SimpleXMLElement Object Into Its JSON Representation
+            $objJsonDocument = json_encode($objXmlDocument);
+            //Decode the JSON String Into an Array
+            $arrOutput = json_decode($objJsonDocument, TRUE);
+
+            echo "XMLdata count N:" . count($arrOutput["Loc"]);
+
+            dump($arrOutput["Loc"][0]);
+            dump($arrOutput["Loc"][1]);
+            //dump($arrOutput["Loc"]);// ci mette un po'
+
+            Cache::forever('LocList', $objJsonDocument);
+            echo "STATUS:CACHED";
+
+//        $filteredLocality = array_filter($arrOutput["Loc"], 'filter');
+//        $elementArray = array();
+//
+//        //LOOP ATTRAVERSO LA CHIAVE PER INDICE DI ARRAY ASSOCIATIVO
+//        foreach ($filteredLocality as $key => $value) {
+//            //echo $key;
+//            $convertCoordinates = [];
+//            array_push($convertCoordinates, (float)$value["lon_wgs84"], (float)$value["lat_wgs84"]); //aggiunge 2 elementi all'array
+//            //$coordinates = json_encode($convertCoordinates); //questa istruzione converte in stringa non andava bene.
+//
+//
+//            $element = new stdClass();
+//            $element->name = $value["nazione"];
+//            $element->description = $value["desloc_cfti"];
+//            $element->coordinates = $convertCoordinates;//$coordinates;
+//            $element->url = "http://www.google.it";
+//            //$element->key = $key; //SE SI VUOLE AGGIUNGERE LA CHIAVE
+//            //aggiungo elemento nell'array
+//            $elementArray[] = $element;
+//            //DEBUG INFORMAZIONI
+//            //print_r($elementArray);
+//        }
+        }
+    }
+
+
+
+
 
 
 

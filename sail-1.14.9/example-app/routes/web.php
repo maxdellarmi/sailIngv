@@ -18,10 +18,22 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//PRIMA PAGINA ORIGINALE
-Route::get('/cfti5', function () {
-    return view('indexCFTI5');
-});
+
+/*
+ * https://laracasts.com/discuss/channels/laravel/routes-with-query-string
+ * Route::get('owners', array('uses' => 'PownersController@ownerlist'));
+And use laravels normal request methods to get the data.
+
+Copy Code
+$whatever = $request->input('thegetvarpassed');
+
+$requestVariables = $request->input('inputData');
+
+*/
+
+
+
+
 //PAGINA TERREMOTI MODIFICATA CACHING STORAGE
 Route::get('/cfti5CS', function () {
     Log::info("Caricamento Resources\\Views\\indexCFTI5CStorage.blade.php...");
@@ -41,8 +53,23 @@ Route::get('/loadGeoJSONDataFromCache','PhotoController@loadGeoJSONDataFromCache
 
 Route::get('/indexQuakesXML','PhotoController@indexQuakesXML'); //gestione xml quakes
 Route::get('/photoLoadXML','PhotoController@indexLoadXML');
+
+Route::get('/quake.php', 'PhotoController@singleQuakeLoading' ) ;
+
+
+//http://localhost/quakeSources/09698.xml => http://localhost/quakeSourcesXMLService/09698
+Route::get('/quakeSourcesXMLService/{nterrId}', function ($nterrId) {
+    $result = (new PhotoController())->quakeSourcesLoading($nterrId);
+//    header('Content-Type: application/xml');
+    return $result;
+});
+//PRIMA PAGINA ORIGINALE=>BLADE
+Route::get('/cfti5', function () {
+    return view('indexCFTI5');
+});
+
 //TODO: effettuare il get di geoJSON ma poi passare al blade in fase di caricamento iniziare i dati
-/**************TODO:GESTIONE TERREMOTI BEGIN ************************/
+/**************TODO:GESTIONE TERREMOTI END ************************/
 //PRIMA CHIAMATA DATI CACHATI DELLE LOCALITY TEST indexV3LocFull.blade
 Route::get('/indexV3LocFull3', function () {
     $result = (new PhotoController())->indexLocalityLoad();

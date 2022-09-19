@@ -390,13 +390,15 @@ function zoomHandlingWMSLAYERSStrum() {
 
 
 function clusteringObjectWithFirstElementStyle (feature) {
-    console.log("clusteringObjectWithFirstElementStyle");
-    var size = feature.get('features').length;
-    if (size === 1) {
-        return feature.get('features')[0].getStyle();
-    } else if (feature.get('features') !== undefined) {
-        return feature.get('features')[0].getStyle();
-    }
+    //TODO:clusteringObjectWithFirstElementStyle commentato x questioni di performance chiamato x ogni feature (anche 500/1000 volte).
+    //console.log("clusteringObjectWithFirstElementStyle");
+    if (feature.get('features') !== undefined) return feature.get('features')[0].getStyle();
+    // var size = feature.get('features').length;
+    // if (size === 1) {
+    //     return feature.get('features')[0].getStyle();
+    // } else if (feature.get('features') !== undefined) {
+    //     return feature.get('features')[0].getStyle();
+    // }
 }
 
 //************************************TODO:GESTIONE DESERIALIZZAZIONE+ GEOJSON***********************************************************//
@@ -1219,15 +1221,6 @@ function creazioneMappaQuakesPHP (quakes) {
         } catch (e) {
             console.error(e, e.stack);
         }
-
-
-        var json = new ol.format.GeoJSON().writeFeatures(vectorLayer.getSource().getFeatures(), {
-            dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'
-        });
-        console.log("EXPORT DI TUTTO IL VECTOR LAYER DEI QUAKES...");
-        console.log(json);
-
-
     });
 }
 

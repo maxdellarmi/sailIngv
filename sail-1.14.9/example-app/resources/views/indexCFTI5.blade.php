@@ -35,22 +35,10 @@
         // ... and deactivate it, to make sure only the polyfill encoder script that follows will be used
         window.TextEncoder = null;
 
-
-        // console.log("chiamata a url di test per save json...")
-        // var data = [
-        //         1,
-        //         2,
-        //         3
-        //     ];
-        //     $.ajax({
-        //         url:'/test',
-        //         type: 'POST',
-        //         dataType:'json',
-        //         contentType: 'json',
-        //         data: JSON.stringify(data),
-        //         contentType: 'application/json; charset=utf-8',
-        //     });
-
+        //Funzionalità che cacha solo xml dati con commento classe Manajax e utilizzo jquery con callback .then
+        //$.ajax({
+        //url: '/indexQuakesXML',  //http://localhost/indexQuakesXML => Route::get('/indexQuakesXML','PhotoController@indexQuakesXML');
+        //}).then ( function(XmlText) {  //ajaxUpdater.callBackFunc = this.parseQuakes;
 
     </script>
 

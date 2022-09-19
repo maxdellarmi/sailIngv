@@ -35,21 +35,10 @@
         // ... and deactivate it, to make sure only the polyfill encoder script that follows will be used
         window.TextEncoder = null;
 
-
-        // console.log("chiamata a url di test per save json...")
-        // var data = [
-        //         1,
-        //         2,
-        //         3
-        //     ];
-        //     $.ajax({
-        //         url:'/test',
-        //         type: 'POST',
-        //         dataType:'json',
-        //         contentType: 'json',
-        //         data: JSON.stringify(data),
-        //         contentType: 'application/json; charset=utf-8',
-        //     });
+        //CFTI5CS con sperimentazione del salvataggio su cache di array e feature tramite geoJSOn e
+        // $.ajax({
+        //url: '/saveQuakesData',  //http://localhost/saveQuakesData => Route::post('/test','PhotoController@saveQuakesData');
+        //url: '/saveQuakesGeoJSONData',  //http://localhost/saveQuakesGeoJSONData => Route::post('/test','PhotoController@saveQuakesGeoJSONData');
 
 
     </script>

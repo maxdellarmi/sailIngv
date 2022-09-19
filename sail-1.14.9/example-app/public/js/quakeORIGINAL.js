@@ -9,7 +9,6 @@ var epiZ=5000;
 
 // XML paths
 var xmlServicePQ = './quakeSources/' + Nterr + '.xml';
-
 var xmlServiceEE = 'EEList.xml';
 var xmlServiceEE_MED = 'EEList_MED.xml';
 var xmlServiceEQLIST = 'QuakeList.xml';
@@ -258,185 +257,136 @@ function bindSelectEvent(evt) {
 //  needed for EE non in PQ
 // ==========================================================================================
 function requestEQLISTData(){
-    console.log("quake.js->requestEQLISTData.....");
+    console.log("requestEQLISTData");
 
 	//new LogTools().addLog('Requesting quakes<br />', 40);
-	// var ajaxUpdater = new Manajax(xmlServiceEQLIST);
-	// ajaxUpdater.TxType = 'GET';
-	// ajaxUpdater.responseType = 'xml';
-	// this.callBackBlock = 'map';
-	// ajaxUpdater.callBackFunc = this.parseQuakeList;
-	// ajaxUpdater.toScroll = false;
-	// ajaxUpdater.requestAction();
-
-    $.ajax({
-        url: '/indexQuakesXML',  //http://localhost/indexQuakesXML => Route::get('/indexQuakesXML','PhotoController@indexQuakesXML');
-        type: 'GET',
-        dataType: 'text', //text/xml
-        contentType: 'application/xml',
-        //data:  JSON.stringify(quakesDataArray),
-        success: function(data){
-            if(data !== undefined){
-                console.log("success loaded CACHED  xml quakes from server...");
-                //console.log(data);
-            }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.error(textStatus);
-            console.error(errorThrown);
-        }
-
-    }).then ( function(XmlText) {  //ajaxUpdater.callBackFunc = this.parseQuakeList;
-        console.log("quake.js->parseQuakeList....");
-        //new LogTools().addLog('Parsing all quakes<br />', 80);
-        XMLQuakeList = new DOMParser().parseFromString(XmlText.trim(), 'text/xml');
-        XMLQuakeListArrived = true;
-        var markers = XMLQuakeList.documentElement.getElementsByTagName("Quake");
-
-        if(markers.length > 0){
-            for (var i = 0; i < markers.length; i++){
-                NterrALLEQ[i] = XMLQuakeList.getElementsByTagName("nterr")[i].childNodes[0].nodeValue;
-                // Nterr1 = Nterr[0];
-
-                var Zone = XMLQuakeList.getElementsByTagName("cat")[i].childNodes[0].nodeValue;
-
-                // CHECK NPERIOD -- QUESTO NON DOVRA' PIU' SERVIRE QUNDO I DATI SARANNO A POSTO!!!!!!!!!!!!!
-                var CheckNperiod =  XMLQuakeList.getElementsByTagName("nperiod")[i];
-                NperiodALLEQ[i] = CheckNperiod.childNodes.length ? CheckNperiod.childNodes[0].nodeValue : '';
-
-                xmlServicePQ_ALLEQ[i] = './quakeSources/' + NterrALLEQ[i] + '.xml';
-                DateLabelALLEQ[i] =  XMLQuakeList.getElementsByTagName("data_label")[i].childNodes[0].nodeValue;
-                YearALLEQ[i] = parseInt(XMLQuakeList.getElementsByTagName("anno")[i].childNodes[0].nodeValue);
-
-                var CheckMonth =  XMLQuakeList.getElementsByTagName("mese")[i];
-                MonthALLEQ[i] = CheckMonth.childNodes.length ? CheckMonth.childNodes[0].nodeValue : '';
-                if (MonthALLEQ[i]=="") MonthALLEQ[i] = "00"
-
-                var CheckDay =  XMLQuakeList.getElementsByTagName("giorno")[i];
-                DayALLEQ[i] = CheckDay.childNodes.length ? CheckDay.childNodes[0].nodeValue : '';
-                if (DayALLEQ[i]=="") DayALLEQ[i] = "00"
-
-                TimeLabelALLEQ[i] =  XMLQuakeList.getElementsByTagName("time_label")[i].childNodes[0].nodeValue;
-
-                var CheckHour =  XMLQuakeList.getElementsByTagName("ora")[i];
-                HourALLEQ[i] = CheckHour.childNodes.length ? CheckHour.childNodes[0].nodeValue : '';
-                if (HourALLEQ[i]=="-9" || HourALLEQ[i]=="" ) HourALLEQ[i] = 0;
-
-                var CheckMinu =  XMLQuakeList.getElementsByTagName("minu")[i];
-                MinuALLEQ[i] = CheckMinu.childNodes.length ? CheckMinu.childNodes[0].nodeValue : '';
-                if (MinuALLEQ[i]=="-9" || MinuALLEQ[i]=="" ) MinuALLEQ[i] = 0;
-
-                var CheckSec =  XMLQuakeList.getElementsByTagName("sec")[i];
-                SecALLEQ[i] = CheckSec.childNodes.length ? CheckSec.childNodes[0].nodeValue : '';
-                if (SecALLEQ[i]=="-9" || SecALLEQ[i]=="" ) SecALLEQ[i] = 0;
-
-                LatALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("lat")[i].childNodes[0].nodeValue).toFixed(3);
-                LonALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("lon")[i].childNodes[0].nodeValue).toFixed(3);
-
-                ImaxALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("imax")[i].childNodes[0].nodeValue);
-                if (ImaxALLEQ[i] == 9.1) ImaxALLEQ[i] = 9;
-                if (ImaxALLEQ[i] == 8.2) ImaxALLEQ[i] = 8;
-                if (ImaxALLEQ[i] == 8.1) ImaxALLEQ[i] = 8;
-                if (ImaxALLEQ[i] == 6.1) ImaxALLEQ[i] = 6;
-                if (ImaxALLEQ[i] == 6.6) ImaxALLEQ[i] = 6.5;
-                if (ImaxALLEQ[i] == 4.6) ImaxALLEQ[i] = 4.5;
-                if (ImaxALLEQ[i] == 5.1) ImaxALLEQ[i] = 5;
-
-                IoALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("io")[i].childNodes[0].nodeValue);
-
-                var flagNP = XMLQuakeList.getElementsByTagName("npun")[i].childNodes.length;
-                if (flagNP > 0) {
-                    iNP_ALLEQ[i] = XMLQuakeList.getElementsByTagName("npun")[i].childNodes[0].nodeValue;
-                } else {
-                    iNP_ALLEQ[i] = 0
-                };
-                iNP_ALLEQ[i] = parseInt(iNP_ALLEQ[i])
-
-                MeALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("mm")[i].childNodes[0].nodeValue);
-                LocationALLEQ[i] = XMLQuakeList.getElementsByTagName("earthquakelocation")[i].childNodes[0].nodeValue;
-                CountryALLEQ[i] = XMLQuakeList.getElementsByTagName("country")[i].childNodes[0].nodeValue;
-
-                //verifico la lunghezza del campo, perchè se è vuoto il "nodeValue" restituisce errore
-                var flagET_ALLEQ = XMLQuakeList.getElementsByTagName("epicenter_type")[i].childNodes.length;
-                if (flagET_ALLEQ > 0) {
-                    EpicenterALLEQ[i] = XMLQuakeList.getElementsByTagName("epicenter_type")[i].childNodes[0].nodeValue;
-                } else {
-                    EpicenterALLEQ[i] = "Local effects"
-                };
-
-                // QUESTA E' LA RELIABILITY E C'E' SOLO QUI! IN LOCALITY NON LA LEGGO PERCHE' NON LA USO
-                if (XMLQuakeList.getElementsByTagName("rel")[i].childNodes.length == 0) RelALLEQ[i] = ""
-                else if  (XMLQuakeList.getElementsByTagName("rel")[i].childNodes[0].length == 0) RelALLEQ[i] = ""
-                else RelALLEQ[i] = XMLQuakeList.getElementsByTagName("rel")[i].childNodes[0].nodeValue;
-                if (RelALLEQ[i] == "?") {RelALLEQ[i]="S"}
-            }
-
-            //http://localhost/quakeSources/09698.xml?output=xml
-
-            $.ajax({
-                url: '/quakeSourcesXMLService/' + Nterr ,  //localhost/quakeSourcesXMLService/09698 =>Route::get('/quakeSourcesXMLService/{nterrId}', function ($nterrId) {     $result = (new PhotoController())->quakeSourcesLoading($nterrId); });
-                type: 'GET',
-                dataType: 'text',
-                contentType: 'application/xml',
-                success: function(data){
-                    if(data !== undefined){
-                        console.log("success loaded CACHED xml quakes from server...quakeSourcesXMLService/"+ Nterr);
-                        //console.log(data);
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.error(textStatus);
-                    console.error(errorThrown);
-                }
-
-            }).then ( function(XmlText) {  //1) showPQ(); //2)ajaxUpdater.callBackFunc = this.parsePQData;
-                console.log("fake showPQ");
-                console.log("fake parsePQData" + xmlServicePQ);
-                //console.log("parsePQDataXml - showPQ" + XmlText);
-
-                XMLLocList = new DOMParser().parseFromString(XmlText.trim(), 'text/xml');
-                XMLLocListArrived = true;
-                nper = XMLLocList.getElementsByTagName("nperiod")[0].childNodes[0].nodeValue;
-                // chiama funzioen che fa il parsing dell'xml con EE - questa poi lancia parsePQdata2 che finisce il parsing dei dati PQ.. fatto così a causa dei tempi delle funzioni
-                openEE(); //TODO GESTIONE OPEN EE EffettiAmbientali  Cachata e addirittura puo' essere ricercata dal blade all'inizio del caricamento.
-            });
-        }
-    });
+	var ajaxUpdater = new Manajax(xmlServiceEQLIST);
+	ajaxUpdater.TxType = 'GET';
+	ajaxUpdater.responseType = 'xml';
+	this.callBackBlock = 'map';
+	ajaxUpdater.callBackFunc = this.parseQuakeList;
+	ajaxUpdater.toScroll = false;
+	ajaxUpdater.requestAction();
 }
 
+function parseQuakeList(XmlText){
+    console.log("parseQuakeList");
+	//new LogTools().addLog('Parsing all quakes<br />', 80);
+	XMLQuakeList = new DOMParser().parseFromString(XmlText.trim(), 'text/xml');
+	XMLQuakeListArrived = true;
+	var markers = XMLQuakeList.documentElement.getElementsByTagName("Quake");
 
-// function showPQ(){
-// 	var mySelf = this;
-// 	var itemName;
-// 	var callBackBlock;
-// 	var FormReference;
-// 	var XMLData;
-//
-///TODO: VECCHIA GESTIONE caricamento manajax x singleQUAKE
-//     // var ajaxUpdater = new Manajax(xmlServicePQ);
-// 	// ajaxUpdater.TxType = 'GET';
-// 	// ajaxUpdater.responseType = 'xml';
-// 	// this.callBackBlock = 'map';
-// 	// ajaxUpdater.callBackFunc = this.parsePQData;
-// 	// ajaxUpdater.toScroll = false;
-// 	// ajaxUpdater.requestAction();
-//
-//
-// }
-///TODO: VECCHIA GESTIONE caricamento manajax x singleQUAKE callback
-// function parsePQData(XmlText){
-//
-// }
+	if(markers.length > 0){
+		for (var i = 0; i < markers.length; i++){
+			NterrALLEQ[i] = XMLQuakeList.getElementsByTagName("nterr")[i].childNodes[0].nodeValue;
+			// Nterr1 = Nterr[0];
+
+			var Zone = XMLQuakeList.getElementsByTagName("cat")[i].childNodes[0].nodeValue;
+
+			// CHECK NPERIOD -- QUESTO NON DOVRA' PIU' SERVIRE QUNDO I DATI SARANNO A POSTO!!!!!!!!!!!!!
+			var CheckNperiod =  XMLQuakeList.getElementsByTagName("nperiod")[i];
+			NperiodALLEQ[i] = CheckNperiod.childNodes.length ? CheckNperiod.childNodes[0].nodeValue : '';
+
+			xmlServicePQ_ALLEQ[i] = './quakeSources/' + NterrALLEQ[i] + '.xml';
+			DateLabelALLEQ[i] =  XMLQuakeList.getElementsByTagName("data_label")[i].childNodes[0].nodeValue;
+			YearALLEQ[i] = parseInt(XMLQuakeList.getElementsByTagName("anno")[i].childNodes[0].nodeValue);
+
+			var CheckMonth =  XMLQuakeList.getElementsByTagName("mese")[i];
+			MonthALLEQ[i] = CheckMonth.childNodes.length ? CheckMonth.childNodes[0].nodeValue : '';
+			if (MonthALLEQ[i]=="") MonthALLEQ[i] = "00"
+
+			var CheckDay =  XMLQuakeList.getElementsByTagName("giorno")[i];
+			DayALLEQ[i] = CheckDay.childNodes.length ? CheckDay.childNodes[0].nodeValue : '';
+			if (DayALLEQ[i]=="") DayALLEQ[i] = "00"
+
+			TimeLabelALLEQ[i] =  XMLQuakeList.getElementsByTagName("time_label")[i].childNodes[0].nodeValue;
+
+			var CheckHour =  XMLQuakeList.getElementsByTagName("ora")[i];
+			HourALLEQ[i] = CheckHour.childNodes.length ? CheckHour.childNodes[0].nodeValue : '';
+			if (HourALLEQ[i]=="-9" || HourALLEQ[i]=="" ) HourALLEQ[i] = 0;
+
+			var CheckMinu =  XMLQuakeList.getElementsByTagName("minu")[i];
+			MinuALLEQ[i] = CheckMinu.childNodes.length ? CheckMinu.childNodes[0].nodeValue : '';
+			if (MinuALLEQ[i]=="-9" || MinuALLEQ[i]=="" ) MinuALLEQ[i] = 0;
+
+			var CheckSec =  XMLQuakeList.getElementsByTagName("sec")[i];
+			SecALLEQ[i] = CheckSec.childNodes.length ? CheckSec.childNodes[0].nodeValue : '';
+			if (SecALLEQ[i]=="-9" || SecALLEQ[i]=="" ) SecALLEQ[i] = 0;
+
+			LatALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("lat")[i].childNodes[0].nodeValue).toFixed(3);
+			LonALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("lon")[i].childNodes[0].nodeValue).toFixed(3);
+
+			ImaxALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("imax")[i].childNodes[0].nodeValue);
+			if (ImaxALLEQ[i] == 9.1) ImaxALLEQ[i] = 9;
+			if (ImaxALLEQ[i] == 8.2) ImaxALLEQ[i] = 8;
+			if (ImaxALLEQ[i] == 8.1) ImaxALLEQ[i] = 8;
+			if (ImaxALLEQ[i] == 6.1) ImaxALLEQ[i] = 6;
+			if (ImaxALLEQ[i] == 6.6) ImaxALLEQ[i] = 6.5;
+			if (ImaxALLEQ[i] == 4.6) ImaxALLEQ[i] = 4.5;
+			if (ImaxALLEQ[i] == 5.1) ImaxALLEQ[i] = 5;
+
+			IoALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("io")[i].childNodes[0].nodeValue);
+
+			var flagNP = XMLQuakeList.getElementsByTagName("npun")[i].childNodes.length;
+			if (flagNP > 0) {
+			iNP_ALLEQ[i] = XMLQuakeList.getElementsByTagName("npun")[i].childNodes[0].nodeValue;
+			} else {
+				iNP_ALLEQ[i] = 0
+			};
+			iNP_ALLEQ[i] = parseInt(iNP_ALLEQ[i])
+
+			MeALLEQ[i] = parseFloat(XMLQuakeList.getElementsByTagName("mm")[i].childNodes[0].nodeValue);
+			LocationALLEQ[i] = XMLQuakeList.getElementsByTagName("earthquakelocation")[i].childNodes[0].nodeValue;
+			CountryALLEQ[i] = XMLQuakeList.getElementsByTagName("country")[i].childNodes[0].nodeValue;
+
+			//verifico la lunghezza del campo, perchè se è vuoto il "nodeValue" restituisce errore
+			var flagET_ALLEQ = XMLQuakeList.getElementsByTagName("epicenter_type")[i].childNodes.length;
+			if (flagET_ALLEQ > 0) {
+				EpicenterALLEQ[i] = XMLQuakeList.getElementsByTagName("epicenter_type")[i].childNodes[0].nodeValue;
+			} else {
+				EpicenterALLEQ[i] = "Local effects"
+			};
+
+			// QUESTA E' LA RELIABILITY E C'E' SOLO QUI! IN LOCALITY NON LA LEGGO PERCHE' NON LA USO
+			if (XMLQuakeList.getElementsByTagName("rel")[i].childNodes.length == 0) RelALLEQ[i] = ""
+			else if  (XMLQuakeList.getElementsByTagName("rel")[i].childNodes[0].length == 0) RelALLEQ[i] = ""
+			else RelALLEQ[i] = XMLQuakeList.getElementsByTagName("rel")[i].childNodes[0].nodeValue;
+			if (RelALLEQ[i] == "?") {RelALLEQ[i]="S"}
+		}
+		showPQ();
+	}
+}
+
+function showPQ(){
+	var mySelf = this;
+	var itemName;
+	var callBackBlock;
+	var FormReference;
+	var XMLData;
+
+    ///TODO: VECCHIA GESTIONE caricamento manajax x singleQUAKE
+    var ajaxUpdater = new Manajax(xmlServicePQ);
+	ajaxUpdater.TxType = 'GET';
+	ajaxUpdater.responseType = 'xml';
+	this.callBackBlock = 'map';
+	ajaxUpdater.callBackFunc = this.parsePQData;
+	ajaxUpdater.toScroll = false;
+	ajaxUpdater.requestAction();
 
 
+}
 
-////TODO: CONTINUA DA QUI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!////
-///parsePQData - openEE
-// quake.js:455 parseEEData - openEE:EEList.xmlorEEList_MED.xml (potrebbe eseguire xmlServiceEE_MED o xmlServiceEE )
-//              callback = > parseEEData
-// quake.js:511 parsePQData2 : undefined
-// language.js:967 language.js  $('section').translatable commentato perche lavora su oggetti google non piu presenti
-// quake.js:2140 ESECUZIONE parsePQData2 finita
+function parsePQData(XmlText){
+	console.log("parsePQData"+ xmlServicePQ);
+	//console.log("parsePQDataXml - showPQ"+ XmlText);
+
+	XMLLocList = new DOMParser().parseFromString(XmlText.trim(), 'text/xml');
+	XMLLocListArrived = true;
+	nper = XMLLocList.getElementsByTagName("nperiod")[0].childNodes[0].nodeValue;
+	// chiama funzioen che fa il parsing dell'xml con EE - questa poi lancia parsePQdata2 che finisce il parsing dei dati PQ.. fatto così a causa dei tempi delle funzioni
+	openEE();
+}
+
 /** Se Nterr.substring(0,2) == "M2" allora chiama un altro file
  */
 function openEE(){
@@ -511,8 +461,7 @@ function parseEEData(XmlText){
         }
 
 	}
-    //TODO:VERIFICARE! QUI VENIVA CHIAMATA SENZA PASSAGGIO DI PARAMETRI
-	parsePQData2(XmlText);
+	parsePQData2();
 }
 
 function parsePQData2(XmlText){

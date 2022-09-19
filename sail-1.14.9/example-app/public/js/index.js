@@ -107,12 +107,12 @@ var GmapsTools = function(){
             url: '/indexQuakesXML',  //http://localhost/indexQuakesXML => Route::get('/indexQuakesXML','PhotoController@indexQuakesXML');
             type: 'GET',
             dataType: 'text', //text/xml
-            contentType: 'text/xml',
+            contentType: 'application/xml',
             //data:  JSON.stringify(quakesDataArray),
-            contentType: 'application/json; charset=utf-8',
+            //contentType: 'application/json; charset=utf-8',
             success: function(data){
                 if(data !== undefined){
-                    console.log("success loaded xml quakes from server...");
+                    console.log("success loaded CACHED xml quakes from server...");
                     //console.log(data);
                 }
             },

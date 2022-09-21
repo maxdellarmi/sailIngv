@@ -31,6 +31,13 @@ $requestVariables = $request->input('inputData');
 
 */
 
+/***https://laracasts.com/discuss/channels/laravel/response-does-not-support-the-following-options-no-cache
+@jorge_dev96 you are passing wrong data. If you check ./vendor/symfony/http-foundation/Response.php you will find that scripts compares passed value with the constants.
+ * You will then see that there is no-cache or max-age. It is no_cache and max_age.
+ *
+ * https://stackoverflow.com/questions/63759808/laravel-7-why-isnt-my-session-cookie-getting-set-in-a-browser
+ */
+
 
 
 
@@ -52,29 +59,28 @@ Route::post('/saveQuakesData','PhotoController@saveQuakesData');
 Route::post('/saveQuakesGeoJSONData','PhotoController@saveQuakesGeoJSONData');
 Route::get('/loadGeoJSONDataFromCache','PhotoController@loadGeoJSONDataFromCache');
 
-Route::get('/indexQuakesXML','PhotoController@indexQuakesXML'); //gestione xml quakes
+Route::get('/indexQuakesXML','PhotoController@indexQuakesXML')->middleware('cache.headers:public;max_age=3600;etag'); //86400 1 gg 300 5min
 Route::get('/photoLoadXML','PhotoController@indexLoadXML');
 
-Route::get('/quake.php', 'PhotoController@singleQuakeLoading' ) ;
-
+Route::get('/quake.php', 'PhotoController@singleQuakeLoading' )->middleware('cache.headers:public;max_age=3600;etag'); //86400 1 gg 300 5min;
 
 //http://localhost/quakeSources/09698.xml => http://localhost/quakeSourcesXMLService/09698
 Route::get('/quakeSourcesXMLService/{nterrId}', function ($nterrId) {
     $result = (new PhotoController())->quakeSourcesLoading($nterrId);
 //    header('Content-Type: application/xml');
     return $result;
-});
+})->middleware('cache.headers:public;max_age=3600;etag'); //86400 1 gg 300 5min;
 
 // ServiceEE = '/EEListService';   // =>'EEList.xml';
-Route::get('/EEListService', 'PhotoController@serviceEEList');
+Route::get('/EEListService', 'PhotoController@serviceEEList')->middleware('cache.headers:public;max_age=3600;etag'); //86400 1 gg 300 5min;
 
 // ServiceEE_MED = '/EEList_MEDService';  // =>'EEList_MED.xml';
-Route::get('/EEList_MEDService', 'PhotoController@serviceEEList_MED');
+Route::get('/EEList_MEDService', 'PhotoController@serviceEEList_MED')->middleware('cache.headers:public;max_age=3600;etag'); //86400 1 gg 300 5min;
 
 //PRIMA PAGINA ORIGINALE=>BLADE
 Route::get('/cfti5', function () {
     return view('indexCFTI5');
-});
+})->middleware('cache.headers:public;max_age=3600;etag'); //86400 1 gg 300 5min;
 
 //TODO: effettuare il get di geoJSON ma poi passare al blade in fase di caricamento iniziare i dati
 /**************TODO:GESTIONE TERREMOTI END ************************/

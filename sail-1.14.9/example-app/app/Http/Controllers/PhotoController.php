@@ -213,7 +213,7 @@ class PhotoController extends Controller
         });
         Log::info('serviceEEList@@Attempt display data From REDIS server END returning data');
         /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
-        return response()->make($listXML)->header("Content-Type", "application/xml"); //->header( "cache-control","public")->header( "max-age","84600");
+        return response()->make($listXML)->header("Content-Type", "application/xml");
     }
 
 //todo: NON PIU UTILIZZATO DEADCODE

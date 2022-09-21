@@ -42,8 +42,9 @@ Route::get('/cfti5CS', function () {
 
 
 
+
 //Route::get('/test','PhotoController@saveJson');
-Route::post('/test','PhotoController@saveJson');
+Route::post('/test','PhotoController@save1Json');
 
 /**************TODO:GESTIONE TERREMOTI BEGIN ************************/
 Route::get('/loadQuakesDataFromCache','PhotoController@loadQuakesDataFromCache');
@@ -63,6 +64,13 @@ Route::get('/quakeSourcesXMLService/{nterrId}', function ($nterrId) {
 //    header('Content-Type: application/xml');
     return $result;
 });
+
+// ServiceEE = '/EEListService';   // =>'EEList.xml';
+Route::get('/EEListService', 'PhotoController@serviceEEList');
+
+// ServiceEE_MED = '/EEList_MEDService';  // =>'EEList_MED.xml';
+Route::get('/EEList_MEDService', 'PhotoController@serviceEEList_MED');
+
 //PRIMA PAGINA ORIGINALE=>BLADE
 Route::get('/cfti5', function () {
     return view('indexCFTI5');

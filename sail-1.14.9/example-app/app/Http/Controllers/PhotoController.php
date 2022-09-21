@@ -45,10 +45,8 @@ class PhotoController extends Controller
     function singleQuakeLoading(Request $request)
     {
     //      $request->query->keys()[0]
-    //      dump($request->query->all());
-    //      dump($request->query->keys()[0]);
-    //      dump(substr($request->query->keys()[0], 0, -2));
-    //        $nterrCodeQuake =substr($request->query->keys()[0], 0, -2); //rimuove gli ultimi due caratteri della lingua
+    //      dump($request->query->all()); dump($request->query->keys()[0]); dump(substr($request->query->keys()[0], 0, -2));
+        // $nterrCodeQuake =substr($request->query->keys()[0], 0, -2); //rimuove gli ultimi due caratteri della lingua
     //        Log::info($request->query->all());
         return view('quake');
     }
@@ -67,6 +65,183 @@ class PhotoController extends Controller
         Log::info($resultQuakeSourcesXML);
         return $resultQuakeSourcesXML;
     }
+
+    /**
+     * @return mixed Restituisce XML del singolo terremoto e cacha il file sempre
+     * (possibilità di creare un futuro uno script di warmUp della cache che precarica tutta la dir)
+     *  FILE di esempio: parsePQData./quakeSources/09698.xml 09698 è il parametro nterrCode passato cosi -
+     * $nterrCodeQuake =substr($request->query->keys()[0], 0, -2); //rimuove gli ultimi due caratteri della lingua
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function loadQuakeSources($nterrCode){
+        $keyNterrSingleQuake= "loadQuakeSources_" . $nterrCode;
+        Log::info('loadQuakeSources@@Attempt display data From REDIS server START key:' . $keyNterrSingleQuake);
+        $listXML = Cache::rememberForever($keyNterrSingleQuake, function () use($keyNterrSingleQuake, $nterrCode)  { //NB. PASSAGGIO PARAMETRI ALLA FUNZIONE DI CALLBACK
+            Log::info('loadQuakeSources@@LOADING XMLFile FROM DISK STARTED...........key:' . $keyNterrSingleQuake);
+            //$_SERVER["DOCUMENT_ROOT"] ROOT recupera path completo fino alla directory public
+            $fullPath =$_SERVER["DOCUMENT_ROOT"] . '/quakeSources/' . $nterrCode . '.xml';  //parsePQData./quakeSources/09698.xml
+            Log::info('loadQuakeSources@@LOADING XMLFile FROM DISK ' . $fullPath . '...........key:' . $keyNterrSingleQuake);
+//            $xmlFileData = file_get_contents("xml->{$fullPath}");
+            $objXmlDocument = simplexml_load_file($fullPath, "SimpleXMLElement", LIBXML_NOCDATA);
+            if ($objXmlDocument === FALSE) {
+                echo "There were errors parsing the XML file.\n";
+                foreach (libxml_get_errors() as $error) {
+                    echo $error->message;
+                }
+                exit;
+            }
+            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al
+            return $objXmlDocument->asXML();
+        });
+        Log::info('loadQuakeSources@@Attempt display data From REDIS server END returning data key:' . $keyNterrSingleQuake);
+
+        ///TODO: SOLUZIONE CHARSET DA APPLICARE OVUNQUE***/
+        /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
+        /*return response($content)
+            ->withHeaders([
+                'Content-Type' => $type,
+                'X-Header-One' => 'Header Value',
+                'X-Header-Two' => 'Header Value',
+            ]); */
+        return response()->make($listXML)->header("Content-Type", "application/xml"); //->header( "cache-control","public")->header( "max-age","84600");
+        //( "cache-control","public"):
+        //( "max-age","84600");
+    }
+
+    /*
+   * 1) ritorna xml puro
+   * 2) cachare xml su rediis
+   * 3) ritorna oggetto cachato
+   * 4)   IN GENERALE PRIMO STEP TUTTO QUELLO CHE ERA LEGGI DA JS e prendi XML diventa prendi da un controller CACHE
+   * 4.1) OTTIMIZZAZIONE ULTERIORE tutte le trasformazioni fatte sul JS dopo la lettura XML vengono quindi effettuate da PHP
+   * 5) Si potrebbe prevedere un save in cache di un array preelaborato e fare un check su rediis se già preesistente non serve rifare l'elaborazione dell'array ma basta utilizzare
+   * quanto gia' presente e cachato.
+   */
+    public function indexQuakesXML(){
+
+        //TODO: chiamata esterna di esempio e trasforma in output il risultato START //
+
+//        $response = Http::withMiddleware(
+//            Middleware::mapResponse(function (ResponseInterface $response) {
+//                $header = $response->getHeader('Content-Type: application/xml');
+//
+//                // ...
+//
+//                return $response;
+//            })
+//        )->get('https://api.namecheap.com/xml.response?ApiUser=(username)&ApiKey=(apikey)&UserName(username)&ClientIp=(ip)');
+//        Log::info($response->status());
+//        Log::info($response->body());
+//        //TODO:sostituisci il body con il file richiesto
+//        $xml = simplexml_load_string($response->body(),'SimpleXMLElement',LIBXML_NOCDATA);
+//        header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
+//        Log::info($xml->asXML());
+//        echo $xml->asXML();
+
+        //TODO: chiamata esterna di esempio  e trasforma in output il risultato END //
+
+        Log::info('indexQuakesXML@@Attempt display data From REDIS server START');
+        $listXML = Cache::rememberForever('QuakesXMLForever', function () {
+            Log::info('indexQuakesXML@@LOADING XMLFile FROM DISK STARTED...........');
+            $objXmlDocument = simplexml_load_file("QuakeList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
+            if ($objXmlDocument === FALSE) {
+                echo "There were errors parsing the XML file.\n";
+                foreach (libxml_get_errors() as $error) {
+                    echo $error->message;
+                }
+                exit;
+            }
+            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
+            //Log::info($objXmlDocument->asXML()); logging
+            return $objXmlDocument->asXML();
+        });
+        Log::info('indexQuakesXML@@Attempt display data From REDIS server END returning data');
+//        header('Content-Type: application/xml');
+//        return $listXML;
+        ///TODO: SOLUZIONE CHARSET DA APPLICARE OVUNQUE***/
+        /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
+        return response()->make($listXML)->header("Content-Type", "application/xml"); //->header( "cache-control","public")->header( "max-age","84600");
+    }
+
+
+
+
+    /** ServiceEE_MED = '/EEList_MEDService';  // =>'EEList_MED.xml';
+     * @return \Illuminate\Http\Response|mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function serviceEEList_MED(){
+        Log::info('serviceEEList_MED@@Attempt display data From REDIS server START');
+        $listXML = Cache::rememberForever('EEList_MEDServiceForever', function () {
+            Log::info('serviceEEList_MED@@LOADING XMLFile FROM DISK STARTED...........');
+            $objXmlDocument = simplexml_load_file("EEList_MED.xml", "SimpleXMLElement", LIBXML_NOCDATA);
+            if ($objXmlDocument === FALSE) {
+                echo "There were errors parsing the XML file.\n";
+                foreach (libxml_get_errors() as $error) {
+                    echo $error->message;
+                }
+                exit;
+            }
+            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
+            //Log::info($objXmlDocument->asXML()); logging
+            return $objXmlDocument->asXML();
+        });
+        Log::info('serviceEEList_MED@@Attempt display data From REDIS server END returning data');
+        /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
+        return response()->make($listXML)->header("Content-Type", "application/xml"); //->header( "cache-control","public")->header( "max-age","84600");
+    }
+
+    /**     ServiceEE = '/EEListService';   // =>'EEList.xml';
+     * @return \Illuminate\Http\Response|mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function serviceEEList(){
+        Log::info('serviceEEList@@Attempt display data From REDIS server START');
+        $listXML = Cache::rememberForever('EEListServiceForever', function () {
+            Log::info('serviceEEList@@LOADING XMLFile FROM DISK STARTED...........');
+            $objXmlDocument = simplexml_load_file("EEList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
+            if ($objXmlDocument === FALSE) {
+                echo "There were errors parsing the XML file.\n";
+                foreach (libxml_get_errors() as $error) {
+                    echo $error->message;
+                }
+                exit;
+            }
+            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
+            //Log::info($objXmlDocument->asXML()); logging
+            return $objXmlDocument->asXML();
+        });
+        Log::info('serviceEEList@@Attempt display data From REDIS server END returning data');
+        /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
+        return response()->make($listXML)->header("Content-Type", "application/xml"); //->header( "cache-control","public")->header( "max-age","84600");
+    }
+
+//todo: NON PIU UTILIZZATO DEADCODE
+//    /**
+//     * @return mixed Restituisce XML dei terremoti dal file locale cachato
+//     */
+//    public function loadQuakesXML(){
+//
+//        Log::info('loadQuakesXML@@Attempt display data From REDIS server START');
+//        $listXML = Cache::rememberForever('loadQuakesXML', function () {
+//            Log::info('loadQuakesXML@@LOADING XMLFile FROM DISK STARTED...........');
+//            $objXmlDocument = simplexml_load_file("QuakeList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
+//            if ($objXmlDocument === FALSE) {
+//                echo "There were errors parsing the XML file.\n";
+//                foreach (libxml_get_errors() as $error) {
+//                    echo $error->message;
+//                }
+//                exit;
+//            }
+//            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
+//            return $objXmlDocument->asXML();
+//        });
+//        Log::info('loadQuakesXML@@Attempt display data From REDIS server END returning data');
+//        //header('Content-Type: application/xml');
+//        return response()->make($listXML)->header("Content-Type", "application/xml");
+//        //return $listXML;
+//    }
+
 
     /**Salvataggio dei dati di base dei terremoti che dall'XML sono stati elaborati in JS nell'oggetto markersArray e vengono salvati [la classe MARKER viene gestita separatamente]
      * L'informazione viene anche cachata.
@@ -130,118 +305,11 @@ class PhotoController extends Controller
         echo json_encode(array('failed'=>'true'));
     }
 
-    /**
-     * @return mixed Restituisce XML dei terremoti dal file locale cachato
-     */
-    public function loadQuakesXML(){
 
-        Log::info('loadQuakesXML@@Attempt display data From REDIS server START');
-        $listXML = Cache::rememberForever('loadQuakesXML', function () {
-            Log::info('loadQuakesXML@@LOADING XMLFile FROM DISK STARTED...........');
-            $objXmlDocument = simplexml_load_file("QuakeList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
-            if ($objXmlDocument === FALSE) {
-                echo "There were errors parsing the XML file.\n";
-                foreach (libxml_get_errors() as $error) {
-                    echo $error->message;
-                }
-                exit;
-            }
-            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
-            return $objXmlDocument->asXML();
-        });
-        Log::info('loadQuakesXML@@Attempt display data From REDIS server END returning data');
-        //header('Content-Type: application/xml');
-        return response()->make($listXML)->header("Content-Type", "application/xml");
-        //return $listXML;
-    }
 
-    /**
-     * @return mixed Restituisce XML del singolo terremoto e cacha il file sempre
-     * (possibilità di creare un futuro uno script di warmUp della cache che precarica tutta la dir)
-     *  FILE di esempio: parsePQData./quakeSources/09698.xml 09698 è il parametro nterrCode passato cosi -
-     * $nterrCodeQuake =substr($request->query->keys()[0], 0, -2); //rimuove gli ultimi due caratteri della lingua
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function loadQuakeSources($nterrCode){
-        $keyNterrSingleQuake= "loadQuakeSources_" . $nterrCode;
-        Log::info('loadQuakeSources@@Attempt display data From REDIS server START key:' . $keyNterrSingleQuake);
-        $listXML = Cache::rememberForever($keyNterrSingleQuake, function () use($keyNterrSingleQuake, $nterrCode)  { //NB. PASSAGGIO PARAMETRI ALLA FUNZIONE DI CALLBACK
-            Log::info('loadQuakeSources@@LOADING XMLFile FROM DISK STARTED...........key:' . $keyNterrSingleQuake);
-            $fullPath =$_SERVER["DOCUMENT_ROOT"] . '/quakeSources/' . $nterrCode . '.xml';  //parsePQData./quakeSources/09698.xml
-            Log::info('loadQuakeSources@@LOADING XMLFile FROM DISK ' . $fullPath . '...........key:' . $keyNterrSingleQuake);
-//            $xmlFileData = file_get_contents("xml->{$fullPath}");
-            $objXmlDocument = simplexml_load_file($fullPath, "SimpleXMLElement", LIBXML_NOCDATA);
-            if ($objXmlDocument === FALSE) {
-                echo "There were errors parsing the XML file.\n";
-                foreach (libxml_get_errors() as $error) {
-                    echo $error->message;
-                }
-                exit;
-            }
-            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
-            return $objXmlDocument->asXML();
-        });
-        Log::info('loadQuakesXML@@Attempt display data From REDIS server END returning data key:' . $keyNterrSingleQuake);
 
-        ///TODO: SOLUZIONE CHARSET DA APPLICARE OVUNQUE***/
-        /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
-        return response()->make($listXML)->header("Content-Type", "application/xml");
-    }
 
-    /*
-     * 1) ritorna xml puro
-     * 2) cachare xml su rediis
-     * 3) ritorna oggetto cachato
-     * 4)   IN GENERALE PRIMO STEP TUTTO QUELLO CHE ERA LEGGI DA JS e prendi XML diventa prendi da un controller CACHE
-     * 4.1) OTTIMIZZAZIONE ULTERIORE tutte le trasformazioni fatte sul JS dopo la lettura XML vengono quindi effettuate da PHP
-     * 5) Si potrebbe prevedere un save in cache di un array preelaborato e fare un check su rediis se già preesistente non serve rifare l'elaborazione dell'array ma basta utilizzare
-     * quanto gia' presente e cachato.
-     */
-    public function indexQuakesXML(){
 
-        //TODO: chiamata esterna di esempio e trasforma in output il risultato START //
-
-//        $response = Http::withMiddleware(
-//            Middleware::mapResponse(function (ResponseInterface $response) {
-//                $header = $response->getHeader('Content-Type: application/xml');
-//
-//                // ...
-//
-//                return $response;
-//            })
-//        )->get('https://api.namecheap.com/xml.response?ApiUser=(username)&ApiKey=(apikey)&UserName(username)&ClientIp=(ip)');
-//        Log::info($response->status());
-//        Log::info($response->body());
-//        //TODO:sostituisci il body con il file richiesto
-//        $xml = simplexml_load_string($response->body(),'SimpleXMLElement',LIBXML_NOCDATA);
-//        header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
-//        Log::info($xml->asXML());
-//        echo $xml->asXML();
-
-        //TODO: chiamata esterna di esempio  e trasforma in output il risultato END //
-
-        Log::info('indexQuakesXML@@Attempt display data From REDIS server START');
-        $listXML = Cache::rememberForever('QuakesXMLForever', function () {
-            Log::info('indexQuakesXML@@LOADING XMLFile FROM DISK STARTED...........');
-            $objXmlDocument = simplexml_load_file("QuakeList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
-            if ($objXmlDocument === FALSE) {
-                echo "There were errors parsing the XML file.\n";
-                foreach (libxml_get_errors() as $error) {
-                    echo $error->message;
-                }
-                exit;
-            }
-            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
-            //Log::info($objXmlDocument->asXML()); logging
-            return $objXmlDocument->asXML();
-        });
-        Log::info('indexQuakesXML@@Attempt display data From REDIS server END returning data');
-//        header('Content-Type: application/xml');
-//        return $listXML;
-        ///TODO: SOLUZIONE CHARSET DA APPLICARE OVUNQUE***/
-        /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
-        return response()->make($listXML)->header("Content-Type", "application/xml");
-    }
 
 /**************TODO:GESTIONE TERREMOTI  END************************/
 

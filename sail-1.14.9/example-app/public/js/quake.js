@@ -10,8 +10,12 @@ var epiZ=5000;
 // XML paths
 var xmlServicePQ = './quakeSources/' + Nterr + '.xml';
 
-var xmlServiceEE = 'EEList.xml';
-var xmlServiceEE_MED = 'EEList_MED.xml';
+var ServicePQ = '/quakeSourcesXMLService/' + Nterr ;
+//ORIGINALI var xmlServiceEE = 'EEList.xml';
+//ORIGINALI  var xmlServiceEE_MED = 'EEList_MED.xml';
+var ServiceEE = '/EEListService';   // =>'EEList.xml';
+var ServiceEE_MED = '/EEList_MEDService';  // =>'EEList_MED.xml';
+
 var xmlServiceEQLIST = 'QuakeList.xml';
 
 // Google MAP
@@ -21,6 +25,7 @@ var infowindow = new google.maps.InfoWindow();
 
 // external files
 var ASMIlist = [];
+
 
 // -------------      ALL quakes from quake list
 var xmlServicePQ_ALLEQ = [];
@@ -109,33 +114,102 @@ var E1listExport = [];
 
 
 // Get list of events in ASMI/CPTI
-$.get('CFTI4med_ASMI_20170523.txt', function(data){
-		   ASMIlist = data.split('\r');
+// $.get('CFTI4med_ASMI_20170523.txt', function(data){
+// 		   ASMIlist = data.split('\r');
+// });
+$.ajax({
+    url: 'CFTI4med_ASMI_20170523.txt',
+    type: 'GET',
+    cache: true,
+    dataType: 'text', //text/xml
+    contentType: 'text/xml',
+    success: function(data){
+        if(data !== undefined){
+            console.log("success loaded CACHED  CFTI4med_ASMI_20170523.txt quakes from server...");
+            ASMIlist = data.split('\r');
+        }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+        console.error(textStatus);
+        console.error(errorThrown);
+    }
 });
 
-// Get info on casualties
-$.get('Morti_Feriti.txt', function(data){
-	dead_list = data.split('\n');
-	for (var i = 0; i < dead_list.length; i++) {
-		var line = dead_list[i].split(/\t/)
-		dead_nperiod[i] = line[1];
-		dead_amount[i] = line[2];
-		dead_class[i] = line[3];
-		dead_affid[i] = line[4];
-	}
+
+// // Get info on casualties
+// $.get('Morti_Feriti.txt', function(data){
+// 	dead_list = data.split('\n');
+// 	for (var i = 0; i < dead_list.length; i++) {
+// 		var line = dead_list[i].split(/\t/)
+// 		dead_nperiod[i] = line[1];
+// 		dead_amount[i] = line[2];
+// 		dead_class[i] = line[3];
+// 		dead_affid[i] = line[4];
+// 	}
+// });
+
+$.ajax({
+    url: 'Morti_Feriti.txt',
+    type: 'GET',
+    cache: true,
+    dataType: 'text', //text/xml
+    contentType: 'text/xml',
+    success: function(data){
+        if(data !== undefined){
+            console.log("success loaded CACHED  'Morti_Feriti.txt' quakes from server...");
+            dead_list = data.split('\n');
+            for (var i = 0; i < dead_list.length; i++) {
+                var line = dead_list[i].split(/\t/)
+                dead_nperiod[i] = line[1];
+                dead_amount[i] = line[2];
+                dead_class[i] = line[3];
+                dead_affid[i] = line[4];
+            }
+        }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+        console.error(textStatus);
+        console.error(errorThrown);
+    }
 });
 
 // Get valb descriptions
-$.get('valb_descriptions.txt', function(data){
-	valb_list = data.split('\n');
-	for (var i = 0; i < valb_list.length; i++) {
-		var line = valb_list[i].split(/\t/)
-		valb[i] = line[0];
-		valb_descrIT[i] = line[1];
-		valb_descrEN[i] = line[2];
-		valb_textIT[i] = line[3];
-		valb_textEN[i] = line[4];
-	}
+// $.get('valb_descriptions.txt', function(data){
+// 	valb_list = data.split('\n');
+// 	for (var i = 0; i < valb_list.length; i++) {
+// 		var line = valb_list[i].split(/\t/)
+// 		valb[i] = line[0];
+// 		valb_descrIT[i] = line[1];
+// 		valb_descrEN[i] = line[2];
+// 		valb_textIT[i] = line[3];
+// 		valb_textEN[i] = line[4];
+// 	}
+// });
+
+$.ajax({
+    url: 'valb_descriptions.txt',
+    type: 'GET',
+    cache: true,
+    dataType: 'text', //text/xml
+    contentType: 'text/xml',
+    success: function(data){
+        if(data !== undefined){
+            console.log("success loaded CACHED  'valb_descriptions.txt' quakes from server...");
+            valb_list = data.split('\n');
+            for (var i = 0; i < valb_list.length; i++) {
+                var line = valb_list[i].split(/\t/)
+                valb[i] = line[0];
+                valb_descrIT[i] = line[1];
+                valb_descrEN[i] = line[2];
+                valb_textIT[i] = line[3];
+                valb_textEN[i] = line[4];
+            }
+        }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+        console.error(textStatus);
+        console.error(errorThrown);
+    }
 });
 
 function InitializeQuake() {
@@ -374,7 +448,8 @@ function requestEQLISTData(){
             //http://localhost/quakeSources/09698.xml?output=xml
 
             $.ajax({
-                url: '/quakeSourcesXMLService/' + Nterr ,  //localhost/quakeSourcesXMLService/09698 =>Route::get('/quakeSourcesXMLService/{nterrId}', function ($nterrId) {     $result = (new PhotoController())->quakeSourcesLoading($nterrId); });
+                //url: '/quakeSourcesXMLService/' + Nterr ,  //localhost/quakeSourcesXMLService/09698 =>Route::get('/quakeSourcesXMLService/{nterrId}', function ($nterrId) {     $result = (new PhotoController())->quakeSourcesLoading($nterrId); });
+                url: ServicePQ, //localhost/quakeSourcesXMLService/09698 =>Route::get('/quakeSourcesXMLService/{nterrId}', function ($nterrId) {     $result = (new PhotoController())->quakeSourcesLoading($nterrId); });
                 type: 'GET',
                 dataType: 'text',
                 contentType: 'application/xml',
@@ -446,77 +521,103 @@ function openEE(){
 	var callBackBlock;
 	var FormReference;
 	var XMLData;
-	if (Nterr.substring(0,2) == "M2") {
-		var ajaxUpdater = new Manajax(xmlServiceEE_MED);
-	}
-	else var ajaxUpdater = new Manajax(xmlServiceEE);
-	ajaxUpdater.TxType = 'GET';
-	ajaxUpdater.responseType = 'xml';
-	this.callBackBlock = 'map';
-	ajaxUpdater.callBackFunc = this.parseEEData;
-	ajaxUpdater.toScroll = false;
-	ajaxUpdater.requestAction();
-}
+	// if (Nterr.substring(0,2) == "M2") {
+	// 	var ajaxUpdater = new Manajax(xmlServiceEE_MED);
+	// }
+	// else var ajaxUpdater = new Manajax(xmlServiceEE);
+	// ajaxUpdater.TxType = 'GET';
+	// ajaxUpdater.responseType = 'xml';
+	// this.callBackBlock = 'map';
+	// ajaxUpdater.callBackFunc = this.parseEEData;
+	// ajaxUpdater.toScroll = false;
+	// ajaxUpdater.requestAction();
 
-function parseEEData(XmlText){
-	console.log("parseEEData - openEE:" + xmlServiceEE + "or" + xmlServiceEE_MED);
+    if (Nterr.substring(0,2) == "M2") {
+        var ajaxUpdaterService = ServiceEE_MED;
+    }
+    else var ajaxUpdaterService =ServiceEE;
 
-	XMLEEList = new DOMParser().parseFromString(XmlText.trim(), 'text/xml');
-	XMLEEListArrived = true;
 
-	if (Nterr.substring(0,2) == "M2") {
-		var EEall = XMLEEList.documentElement.getElementsByTagName("EE_MED");
-	}
-	else var EEall = XMLEEList.documentElement.getElementsByTagName("EE");
-
-	var k = 0;
-	if(EEall.length > 0){
-		for (var i = 0; i < EEall.length; i++){
-			var sNP = XMLEEList.getElementsByTagName("NPERIOD")[i].childNodes[0].nodeValue;
-
-			if (sNP == nper) {
-				EE_nperiod[k] = nper;
-				if (XMLEEList.getElementsByTagName("NTERR").length == 0) EE_nterr[k] = ""
-				else if  (XMLEEList.getElementsByTagName("NTERR")[i].childNodes.length == 0) EE_nterr[k] = ""
-				else EE_nterr[k] = XMLEEList.getElementsByTagName("NTERR")[i].childNodes[0].nodeValue;
-
-				EE_nloc[k] = XMLEEList.getElementsByTagName("NLOC_CFTI")[i].childNodes[0].nodeValue;
-				var EE_desloc = XMLEEList.getElementsByTagName("DESLOC_CFTI")[i].childNodes[0].nodeValue;
-
-				if (XMLEEList.getElementsByTagName("PROVLET").length == 0) var EE_prov = ''
-				else if (XMLEEList.getElementsByTagName("PROVLET")[i].childNodes.length == 0) var EE_prov = ""
-				else var EE_prov = XMLEEList.getElementsByTagName("PROVLET")[i].childNodes[0].nodeValue;
-
-				var flagCount = XMLEEList.getElementsByTagName("NAZIONE")[i].childNodes.length;
-				if (flagCount > 0) {
-					var EE_country = XMLEEList.getElementsByTagName("NAZIONE")[i].childNodes[0].nodeValue;
-				}
-				if (EE_prov != '') EE_loc[k] = EE_desloc + ' (' + EE_prov + ')'
-				else EE_loc[k] = EE_desloc + ' (' + EE_country + ')'
-
-				if (Nterr.substring(0,2) == "M2") EE_comm[k] = ""
-				else EE_comm[k] = XMLEEList.getElementsByTagName("COMMENTO")[i].childNodes[0].nodeValue;
-
-				if (XMLEEList.getElementsByTagName("NOTESITO").length != 0) {
-					EE_locNote[k] = XMLEEList.getElementsByTagName("NOTESITO")[i].childNodes[0].nodeValue;
-					if (EE_locNote[k] == '-') EE_locNote[k] = "";
-				}
-
-				EE_codeff[k] = XMLEEList.getElementsByTagName("CODICE_EFF")[i].childNodes[0].nodeValue;
-				EE_Lat[k] = parseFloat(XMLEEList.getElementsByTagName("LAT_WGS84")[i].childNodes[0].nodeValue).toFixed(3);
-				EE_Lon[k] = parseFloat(XMLEEList.getElementsByTagName("LON_WGS84")[i].childNodes[0].nodeValue).toFixed(3);
-
-                k += 1
-			} else k = k;
+    $.ajax({
+        url: ajaxUpdaterService,  //
+        type: 'GET',
+        dataType: 'text', //text/xml
+        contentType: 'application/xml',
+        success: function(data){
+            if(data !== undefined){
+                console.log("success loaded CACHED  xml quakes from server...");
+                //console.log(data);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error(textStatus);
+            console.error(errorThrown);
         }
 
-	}
-    //TODO:VERIFICARE! QUI VENIVA CHIAMATA SENZA PASSAGGIO DI PARAMETRI
-	parsePQData2(XmlText);
+    }).then ( function(XmlText) {  //ajaxUpdater.callBackFunc = this.parseEEData;
+        console.log("fake parseEEData -cached openEE:" + ServiceEE + "  or  " + ServiceEE_MED);
+
+        XMLEEList = new DOMParser().parseFromString(XmlText.trim(), 'text/xml');
+        XMLEEListArrived = true;
+
+        if (Nterr.substring(0,2) == "M2") {
+            var EEall = XMLEEList.documentElement.getElementsByTagName("EE_MED");
+        }
+        else var EEall = XMLEEList.documentElement.getElementsByTagName("EE");
+
+        var k = 0;
+        if(EEall.length > 0){
+            for (var i = 0; i < EEall.length; i++){
+                var sNP = XMLEEList.getElementsByTagName("NPERIOD")[i].childNodes[0].nodeValue;
+
+                if (sNP == nper) {
+                    EE_nperiod[k] = nper;
+                    if (XMLEEList.getElementsByTagName("NTERR").length == 0) EE_nterr[k] = ""
+                    else if  (XMLEEList.getElementsByTagName("NTERR")[i].childNodes.length == 0) EE_nterr[k] = ""
+                    else EE_nterr[k] = XMLEEList.getElementsByTagName("NTERR")[i].childNodes[0].nodeValue;
+
+                    EE_nloc[k] = XMLEEList.getElementsByTagName("NLOC_CFTI")[i].childNodes[0].nodeValue;
+                    var EE_desloc = XMLEEList.getElementsByTagName("DESLOC_CFTI")[i].childNodes[0].nodeValue;
+
+                    if (XMLEEList.getElementsByTagName("PROVLET").length == 0) var EE_prov = ''
+                    else if (XMLEEList.getElementsByTagName("PROVLET")[i].childNodes.length == 0) var EE_prov = ""
+                    else var EE_prov = XMLEEList.getElementsByTagName("PROVLET")[i].childNodes[0].nodeValue;
+
+                    var flagCount = XMLEEList.getElementsByTagName("NAZIONE")[i].childNodes.length;
+                    if (flagCount > 0) {
+                        var EE_country = XMLEEList.getElementsByTagName("NAZIONE")[i].childNodes[0].nodeValue;
+                    }
+                    if (EE_prov != '') EE_loc[k] = EE_desloc + ' (' + EE_prov + ')'
+                    else EE_loc[k] = EE_desloc + ' (' + EE_country + ')'
+
+                    if (Nterr.substring(0,2) == "M2") EE_comm[k] = ""
+                    else EE_comm[k] = XMLEEList.getElementsByTagName("COMMENTO")[i].childNodes[0].nodeValue;
+
+                    if (XMLEEList.getElementsByTagName("NOTESITO").length != 0) {
+                        EE_locNote[k] = XMLEEList.getElementsByTagName("NOTESITO")[i].childNodes[0].nodeValue;
+                        if (EE_locNote[k] == '-') EE_locNote[k] = "";
+                    }
+
+                    EE_codeff[k] = XMLEEList.getElementsByTagName("CODICE_EFF")[i].childNodes[0].nodeValue;
+                    EE_Lat[k] = parseFloat(XMLEEList.getElementsByTagName("LAT_WGS84")[i].childNodes[0].nodeValue).toFixed(3);
+                    EE_Lon[k] = parseFloat(XMLEEList.getElementsByTagName("LON_WGS84")[i].childNodes[0].nodeValue).toFixed(3);
+
+                    k += 1
+                } else k = k;
+            }
+
+        }
+        //TODO:VERIFICARE! QUI VENIVA CHIAMATA SENZA PASSAGGIO DI PARAMETRI
+        parsePQData2(XmlText);
+    });
+
 }
 
+
 function parsePQData2(XmlText){
-	console.log("parsePQData2 : " + XmlText);
+	//console.log("parsePQData2 : " + XmlText);
+
+    console.log("parsePQData2 : .....");
 	//var boundsPQ = new google.maps.LatLngBounds();
 
 	// =========================    READ EPICENTER DATA    ==============================================
@@ -2146,6 +2247,28 @@ function parsePQData2(XmlText){
 	// SELEZIONE LINGUA --> FATTA QUI; UNA VOLTA RIEMPITI TUTTI I DIV
 	new LanguageTools().setLanguage(Langsel);
     console.log("ESECUZIONE parsePQData2 finita");
+    /**TODO: ESECUZIONE RECUPERATA DAL FILE MANAJAX ALLA FINE DI TUTTI I CALCOLI INIZIALI VIENE INVOCATO IL CARICAMENTO DELLA MAPPA
+     *
+     * else if (mySelf.URLString == ("EEList.xml?output=xml") || mySelf.URLString == ("EEList_MED.xml?output=xml")  )  {
+     * 						//alert("ciao");
+     * 						console.log("mySelf.URLString - EEList chiamata effettuata per ultimo dopo [quakeSources] TODO visualizzare la mappa");
+     * 						quakesPQMarkers=[];
+     * 						for (var i = 0; i < PQMarkers.length; i++) {
+     * 							quakesPQMarkers.push(PQMarkers[i]);
+     * 						}
+     * 						///TODO:DETAILQUAKES dopo aver valorizzato l'array con tutti le feature mostrarle sulla mappa simile a creazioneMappaLocalityPHP
+     * 						creazioneMappaQuakesPHP(quakesPQMarkers);
+     * 						prepareBASEMAPLayers();
+     * 					}
+     */
+    //dal file MAPOL.js
+    quakesPQMarkers=[]; //dichiarato in mapOL.js
+    for (var i = 0; i < PQMarkers.length; i++) {
+        quakesPQMarkers.push(PQMarkers[i]);
+    }
+    creazioneMappaQuakesPHP(PQMarkers);
+    prepareBASEMAPLayers();
+
 }
 
 

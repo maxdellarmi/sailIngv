@@ -118,7 +118,7 @@ var E1listExport = [];
 // 		   ASMIlist = data.split('\r');
 // });
 $.ajax({
-    url: 'CFTI4med_ASMI_20170523.txt',
+    url: '/OtherFilesService/CFTI4med_ASMI_20170523.txt',
     type: 'GET',
     cache: true,
     dataType: 'text', //text/xml
@@ -148,8 +148,10 @@ $.ajax({
 // 	}
 // });
 
+//$.get('/OtherFilesService/listapdfR.txt', function(data){
+
 $.ajax({
-    url: 'Morti_Feriti.txt',
+    url: '/OtherFilesService/Morti_Feriti.txt',
     type: 'GET',
     cache: true,
     dataType: 'text', //text/xml
@@ -187,7 +189,7 @@ $.ajax({
 // });
 
 $.ajax({
-    url: 'valb_descriptions.txt',
+    url: '/OtherFilesService/valb_descriptions.txt',
     type: 'GET',
     cache: true,
     dataType: 'text', //text/xml
@@ -539,7 +541,7 @@ function openEE(){
 
 
     $.ajax({
-        url: ajaxUpdaterService,  //
+        url: ajaxUpdaterService,
         type: 'GET',
         dataType: 'text', //text/xml
         contentType: 'application/xml',
@@ -1666,8 +1668,10 @@ function parsePQData2(XmlText){
 
 	//Export variableKML
 	ExportKml = "";
-		jQuery.get('KML/quake_a.txt', function(data){
-			ExportKml = data;
+//		jQuery.get('KML/quake_a.txt', function(data){
+    jQuery.get('/OtherFilesService/KML@i_quake_a.txt', function(data){
+
+                ExportKml = data;
 			ExportKml = ExportKml + "<Folder>"+ CarRet + "<name>CFTI5Med - EQ " + DateLabel + '_' + TimeLabel + '_' +  Location + '_' + Country + "</name>"+ CarRet ;
 			ExportKml = ExportKml + "<open>1</open>"+ CarRet;
 			ExportKml = ExportKml + "<description>"+ CarRet;
@@ -1683,9 +1687,11 @@ function parsePQData2(XmlText){
 
 			ExportKml = ExportKml + ExportKmlR;
 
-			jQuery.get('KML/quake_b.txt', function(dataB){
-				ExportKml = ExportKml + dataB;
-		})
+			//jQuery.get('KML/quake_b.txt', function(dataB){
+            jQuery.get('/OtherFilesService/KML@i_quake_b.txt', function(dataB){
+                    ExportKml = ExportKml + dataB;
+                })
+            }
 	})
 
 	$('#loading').hide();

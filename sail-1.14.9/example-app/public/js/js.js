@@ -108,7 +108,10 @@ var PQanchor2 = 5;
 
 
 //----------------- EE classification from external file
-$.get('EE_classif.txt', function(data){
+
+//$.get('EE_classif.txt', function(data){
+//http://localhost/OtherFilesService/listapdfR.txt
+$.get('/OtherFilesService/listapdfR.txt', function(data){
 	EEclass = data.split('\n');
 	for (var i = 0; i < EEclass.length; i++) {
 		line = EEclass[i].split(/\t/)
@@ -121,12 +124,16 @@ $.get('EE_classif.txt', function(data){
 
 
 // ====== READ TXT FILES WITH PDF LIST AND ASMI/CPTI LINKS
- $.get('listapdfT.txt', function(data){
+//$.get('listapdfT.txt', function(data){
+//http://localhost/OtherFilesService/listapdfT.txt
+$.get('/OtherFilesService/listapdfT.txt', function(data){
             pdflist = data.split(',');
             //console.log(pdflist);
 });
 
-$.get('listapdfR.txt', function(data){
+// $.get('listapdfR.txt', function(data){
+//http://localhost/OtherFilesService/listapdfR.txt
+$.get('/OtherFilesService/listapdfR.txt', function(data){
            pdflist2 = data.split(',');
            //console.log(pdflist);
 });

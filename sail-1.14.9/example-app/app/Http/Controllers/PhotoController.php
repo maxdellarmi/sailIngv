@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
@@ -214,6 +215,31 @@ class PhotoController extends Controller
         Log::info('serviceEEList@@Attempt display data From REDIS server END returning data');
         /***RITORNA UNA RISPOSTA STRINGA NO JSON senza applicare ulteriori forzature nel charset UTF8 e cosi rimane FEDELE a quanto richiesto!!!! ****/
         return response()->make($listXML)->header("Content-Type", "application/xml");
+    }
+
+
+    /**
+     * @param $fileNameInput Tutti gli altri file presenti nella stessa dir home;
+     * @return \Illuminate\Http\Response|mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function OtherFilesServiceList($fileNameInput){
+        $keySingleFile= "OtherFilesServiceList_" . $fileNameInput;
+        Log::info('OtherFilesServiceList@@Attempt display data From REDIS server START key:' . $keySingleFile);
+        $listXML = Cache::rememberForever($keySingleFile, function () use($keySingleFile, $fileNameInput)  { //NB. PASSAGGIO PARAMETRI ALLA FUNZIONE DI CALLBACK
+            Log::info('OtherFilesServiceList@@LOADING XMLFile FROM DISK STARTED...........key:' . $keySingleFile);
+            //$_SERVER["DOCUMENT_ROOT"] ROOT recupera path completo fino alla directory public
+            $fullPath =$_SERVER["DOCUMENT_ROOT"] . '/' . str_replace("@", "/", $fileNameInput); //. '.xml';
+            Log::info('OtherFilesServiceList@@LOADING XMLFile FROM DISK ' . $fullPath . '...........key:' . $keySingleFile);
+            //DOWNLOAD FILE $objXmlDocument = File::get($fullPath);
+            //echo nl2br(file_get_contents($fullPath));
+            $objXmlDocument= file_get_contents($fullPath);
+            echo $objXmlDocument;
+            //header('Content-Type: application/text'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al
+            return $objXmlDocument;
+        });
+        Log::info('OtherFilesServiceList@@Attempt display data From REDIS server END returning data key:' . $keySingleFile);
+        return response()->make($listXML); // ->header("Content-Type", "application/text");
     }
 
 //todo: NON PIU UTILIZZATO DEADCODE

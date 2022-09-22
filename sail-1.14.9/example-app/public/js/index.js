@@ -839,7 +839,8 @@ var GmapsTools = function(){
 
 		//Export variableKML
 		ExportKml = "";
-		jQuery.get('KML/i_quake_a.txt', function(data){
+		//jQuery.get('KML/i_quake_a.txt', function(data){
+        jQuery.get('/OtherFilesService/KML@i_quake_a.txt', function(data){
 				ExportKml = data;
 				ExportKml = ExportKml + CarRet +"<Folder>" + CarRet + "<name>CFTI5Med - " + iMarker + " events selected</name>"+ CarRet;
 				ExportKml = ExportKml + "<open>1</open>"+ CarRet;
@@ -851,8 +852,9 @@ var GmapsTools = function(){
 
 				ExportKml = ExportKml + ExportKmlR;
 
-				jQuery.get('KML/i_quake_b.txt', function(dataB){
-					ExportKml = ExportKml + dataB;
+				//jQuery.get('KML/i_quake_b.txt', function(dataB){
+                jQuery.get('/OtherFilesService/KML@i_quake_b.txt', function(dataB){
+                        ExportKml = ExportKml + dataB;
 				})
 		})
 

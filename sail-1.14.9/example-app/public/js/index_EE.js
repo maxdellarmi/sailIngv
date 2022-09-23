@@ -7,6 +7,29 @@ var flagEEaccess = 1;
 flagLOCaccess = 0;
 var flagFilterEE = 0; // questo serve per distinguere la prima volta da quelle in cui si fa un filtro col menu (click su ok)
 
+// var MquakesEELOC = [];
+// var MquakesTitleLOC = [];
+// var MquakesEEcommLOC = [];
+// var ME1commIT = [];
+// var ME1commEN = [];
+
+// MquakesTitleLOC.push([i, quakesTitleLOC]);
+// MquakesEELOC.push([i, quakesEELOC]);
+// MquakesEEcommLOC.push([i, quakesEEcommLOC]);
+// ME1commIT.push([i, E1commIT]);
+// ME1commEN.push([i, E1commEN]); */
+/**
+ *
+ * @type {{MquakesEEcommLOC: *[], ME1commIT: *[], ME1commEN: *[], MquakesTitleLOC: *[], MquakesEELOC: *[]}}
+ */
+var saveJSONIndexEE={
+    "MquakesTitleLOC":  [ ],
+    "MquakesEELOC": [ ],
+    "MquakesEEcommLOC":  [ ],
+    "ME1commIT": [ ],
+    "ME1commEN": [ ]
+};
+
 
 var NumEESel;
 
@@ -226,6 +249,9 @@ function parseEEData(XmlText){
 	var marker;
 	// --------------------------------    PARSE XML WITH ALL EE    ----------------------------------------------
 	var nlocXarray = [];
+
+    console.log("CHECKPOINT 0 ciclo foreach EEALL:" + EEall.length );
+
 	if(EEall.length > 0) {
 
 		// index for selected EE (based on toggles)
@@ -432,13 +458,16 @@ function parseEEData(XmlText){
 			}
 
 			// }
-		}
-
+		} //END FOREACH EEAll
+        console.log("CHECKPOINT 1 prima di sort");
 
 		//QUI AVVIENE UN ORDINAMENTO PER DATA
 		EEmarkersArray.sort(function(a, b){
 			return a.EE_orderdate - b.EE_orderdate
 		});
+
+        console.log("CHECKPOINT 2 after sort");
+
 		for (var i = 0; i < EEmarkersArray.length; i++) {
 			/**NB.IMPORTANTE*E' stato necessario reimpostare tutti quanti gli ID degli elementi per poter riselezionarli e scatenare il proprio evento Click successivamente ****/
 			//console.log('oldId:' +EEmarkersArray[i]['Marker'].values_.id);
@@ -447,6 +476,8 @@ function parseEEData(XmlText){
 
 			nlocXarray[i] = EEmarkersArray[i]['EE_nloc'];
 		}
+
+        console.log("CHECKPOINT 3 after setting all the new IDS");
 	}
 	ExportKml = '';
 	ExportKmlR = '';
@@ -455,6 +486,7 @@ function parseEEData(XmlText){
 	// the loop is through each EE of the array built before because it is easier to build 1 infowindow for each marker, although INFOWINDOWS
 	// store information on all EE at each locality... meaning the are multiple identical infowindows...
 	// To make it faster this may be changed in the future
+    console.log("CHECKPOINT 4 START - building info Windows..FOR + WHILE INDX OF...EEmarkersArray:" + EEmarkersArray.length);
 	for (var i = 0; i < EEmarkersArray.length; i++) {  // loop thorough each selected EE
 
 		// E1all = E1all + EEmarkersArray[i]['EE_comm'];
@@ -501,7 +533,8 @@ function parseEEData(XmlText){
 				}
 				// related to nperiod
 				quakesEELOC[npin] = quakesEELOC[npin] + '<img src="images/EE/color/'+ EEmarkersArray[ind]['EE_codeff'] + '.png" width= "18" vertical-align="-30px"/>' + '&nbsp &nbsp' + '<span class="' + EEmarkersArray[ind]['EE_codeff'] + '_IW">' +  class_titleEE_IT[class_codeEE.indexOf(EEmarkersArray[ind]['EE_codeff'])]  + "</span><br>"
-			} else if (EEmarkersArray[i]['EE_nloc'] == EEmarkersArray[ind]['EE_nloc'] && EEmarkersArray[ind]['EE_nperiod'] != nper){ //when new quake (nperiod) found
+			}
+            else if (EEmarkersArray[i]['EE_nloc'] == EEmarkersArray[ind]['EE_nloc'] && EEmarkersArray[ind]['EE_nperiod'] != nper){ //when new quake (nperiod) found
 
 				// SAVE ARRAYS FOR EACH NPERIOD, USED to build titles of quake when some EE related to nterr
 				var NterrDone = [];
@@ -540,6 +573,15 @@ function parseEEData(XmlText){
 			ind = nlocXarray.indexOf(EEmarkersArray[i]['EE_nloc'], ind+1) // find next index (in nloc array with all EE) of current nloc, starting from position ind+1
 		}
 
+        //CREAZIONE ARRAY GLOBAL x sostituire l'elaborazione del ciclo while con valori costanti.
+        saveJSONIndexEE.MquakesTitleLOC.push([i, quakesTitleLOC]);
+        saveJSONIndexEE.MquakesEELOC.push([i, quakesEELOC]);
+        saveJSONIndexEE.MquakesEEcommLOC.push([i, quakesEEcommLOC]);
+        saveJSONIndexEE.ME1commIT.push([i, E1commIT]);
+        saveJSONIndexEE.ME1commEN.push([i, E1commEN]);
+
+
+
 
 		// link to locality page
 		var LOClink = '<abbr id="EEpage_loclink" title= "' + EElinkLOCabbr_IT + '"><a href="' + LocalityPage + EEmarkersArray[i]['EE_nloc'] + 'IT" target="_blank"><img src="images/link2.png" width= "15" ></a></abbr>'
@@ -553,7 +595,7 @@ function parseEEData(XmlText){
 		}
 		// close infowindow div when infowindow text is complete
 		// OnClickText = '<div class="IW"><div id = "IWclose"><a onclick="infowindow.close(); turnoffRow()" href="#"><img src="images/close.png" height="10px"></a></div>' + OnClickText + '</div></div>'   // VERSIONE PRECEDENTE DELLE IW!! PRIMA CHE GOOGLE CAMBIASSE API
- 
+
 		//assegna un elemento della matrice ad una variabile RecEE
 		// -------------- TABLE
 		var RecEE = EEmarkersArray[i];
@@ -612,8 +654,9 @@ function parseEEData(XmlText){
 		row.appendChild(cell8);
 		tbody.appendChild(row);
 
-
+        //TODO: riaggiungere la gestione dei popup alla fine TEMPO TOT 10sec massimo
 		openPopupEE(RecEE['Marker'], OnClickText, RecEE['EE_nloc'], E1commIT, E1commEN);
+
 		 // console.log("DUMP marker con info popup valorizate....");
 		// console.log(RecEE['Marker']);
 		// console.log(RecEE['Marker'].ContentPopupText);
@@ -632,11 +675,16 @@ function parseEEData(XmlText){
 		ExportText = ExportText.replace(regBR,String.fromCharCode(10));
 	}
 
-	///TODO: EXPORT KML e EXPORTTEXT sono da verificare/gestire
+    console.log("CHECKPOINT 5 END - building info Windows..FOR + WHILE INDX OF...EEmarkersArray:" + EEmarkersArray.length);
+
+
+    ///TODO: EXPORT KML e EXPORTTEXT sono da verificare/gestire
 	//Export variableKML
 	ExportKml = "";
-	jQuery.get('KML/EE_a.txt', function(data){
-		ExportKml = data;
+	jQuery.get('/OtherFilesService/KML@EE_a.txt', function(data){
+        console.log("CHECKPOINT 6 END - readingn KML/EE_a.txt ==} ExportKml ");
+
+        ExportKml = data;
 		ExportKml = ExportKml + CarRet +"<Folder>" + CarRet + "<name>CFTI5Med - " + EEmarkersArray.length + " Environmental Effects selected</name>";
 		ExportKml = ExportKml + "<open>1</open>";
 		ExportKml = ExportKml + "<description>";
@@ -647,10 +695,37 @@ function parseEEData(XmlText){
 
 		ExportKml = ExportKml + ExportKmlR;
 
-		jQuery.get('KML/EE_b.txt', function(dataB){
+		jQuery.get('/OtherFilesService/KML@EE_b.txt', function(dataB){
+            console.log("CHECKPOINT 7 END - readingn KML/EE_b.txt ==} ExportKml ");
 			ExportKml = ExportKml + dataB;
 		})
 	})
+
+/** TODO: SALVATAGGIO DELLE VARIABILI CREAZIONE ARRAY GLOBAL x sostituire l'elaborazione del ciclo while con valori costanti.
+ //CREAZIONE ARRAY GLOBAL x sostituire l'elaborazione del ciclo while con valori costanti.
+ saveJSONIndexEE.MquakesTitleLOC.push([i, quakesTitleLOC]);
+ saveJSONIndexEE.MquakesEELOC.push([i, quakesEELOC]);
+ saveJSONIndexEE.MquakesEEcommLOC.push([i, quakesEEcommLOC]);
+ saveJSONIndexEE.ME1commIT.push([i, E1commIT]);
+ saveJSONIndexEE.ME1commEN.push([i, E1commEN]);
+    $.ajax({
+        url: '/saveJSONFile?IndexEEdataFullCached',  //http://localhost/saveJSONFile?Filename => Route::post('/saveJSONFile', 'PhotoController@saveJSONFile');
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'json',
+        data:  JSON.stringify(saveJSONIndexEE),
+        contentType: 'application/json; charset=utf-8',
+        success: function(data){
+            if(data.success == true){
+                console.log("success saved quakesDataArray<=markersArray.");
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error(textStatus);
+            console.error(errorThrown);
+        }
+
+    })*/
 
 
 	// Table sorting
@@ -661,7 +736,8 @@ function parseEEData(XmlText){
 				//	sort on the first, second and third (order desc) column
 				sortList: [[1,0],[2,0],[3,0]]
 			});
-		});
+            console.log("CHECKPOINT 8 END - $(\"#EE_info\").tablesorter ");
+        });
 		flagFilterEE = 1
 	} else { // LATER TIMES
 		$('.tablesorter').trigger('updateAll');

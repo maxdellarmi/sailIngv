@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Void_;
@@ -45,6 +46,7 @@ class PhotoController extends Controller
      */
     function singleQuakeLoading(Request $request)
     {
+        /// caricamento singola url http://localhost/quake.php?02062IT
     //      $request->query->keys()[0]
     //      dump($request->query->all()); dump($request->query->keys()[0]); dump(substr($request->query->keys()[0], 0, -2));
         // $nterrCodeQuake =substr($request->query->keys()[0], 0, -2); //rimuove gli ultimi due caratteri della lingua
@@ -242,33 +244,6 @@ class PhotoController extends Controller
         return response()->make($listXML); // ->header("Content-Type", "application/text");
     }
 
-//todo: NON PIU UTILIZZATO DEADCODE
-//    /**
-//     * @return mixed Restituisce XML dei terremoti dal file locale cachato
-//     */
-//    public function loadQuakesXML(){
-//
-//        Log::info('loadQuakesXML@@Attempt display data From REDIS server START');
-//        $listXML = Cache::rememberForever('loadQuakesXML', function () {
-//            Log::info('loadQuakesXML@@LOADING XMLFile FROM DISK STARTED...........');
-//            $objXmlDocument = simplexml_load_file("QuakeList.xml", "SimpleXMLElement", LIBXML_NOCDATA);
-//            if ($objXmlDocument === FALSE) {
-//                echo "There were errors parsing the XML file.\n";
-//                foreach (libxml_get_errors() as $error) {
-//                    echo $error->message;
-//                }
-//                exit;
-//            }
-//            header('Content-Type: application/xml'); //dichiarata anche nel mapResponse qui serve se accedi direttamente al file
-//            return $objXmlDocument->asXML();
-//        });
-//        Log::info('loadQuakesXML@@Attempt display data From REDIS server END returning data');
-//        //header('Content-Type: application/xml');
-//        return response()->make($listXML)->header("Content-Type", "application/xml");
-//        //return $listXML;
-//    }
-
-
     /**Salvataggio dei dati di base dei terremoti che dall'XML sono stati elaborati in JS nell'oggetto markersArray e vengono salvati [la classe MARKER viene gestita separatamente]
      * L'informazione viene anche cachata.
      * {"Date":10000100,"DateLabel":"1000 01 -","TimeLabel":"-","Nterr":"00001","Lat":"46.000","Lon":"14.500","Location":"Yugoslavia","Country":"Slovenia","Io":0,"Year":1000,"Month":"01","Day":"00","Hour":0,"Minu":0,"Sec":0,"Me":0,"Imax":0,"Zone":"ITA","Npun":0,"FlagFalse":true,"Level":"S","Note":"F","EpiType":"-","EpiIcon":"F"}
@@ -286,6 +261,84 @@ class PhotoController extends Controller
             Cache::forever('saveQuakesData', json_encode($data));
         }
         echo json_encode(array('success'=>'true'));
+    }
+
+
+    ///
+
+    /**salvataggio JSON singolo file esempio chiamata URL http://localhost/saveJSONFile?Filename
+     * {message: "CSRF token mismatch.", exception: "Symfony\Component\HttpKernel\Exception\HttpException",…}
+        "CSRF token mismatch." Necessario configurare su classe VerifyCsrfToken.php
+     * @param Request $request
+     * @return void
+     */
+    function saveJSONFile(Request $request): void
+    {
+        //      $request->query->keys()[0]
+        //      dump($request->query->all()); dump($request->query->keys()[0]); dump(substr($request->query->keys()[0], 0, -2));
+        Log::info("saveJSONFile called START");
+        $data = json_decode($request->getContent());  //object stdClass dopo averlo convertito dal json in input
+        //Log::info("DATA saveJSONFile:" . $request->getContent() ); //logga il json in input
+        $fileNameToSave = $request->query->keys()[0] . ".json";
+        Log::info("saveJSONFile called:". $fileNameToSave);
+        //( $_SERVER["DOCUMENT_ROOT"]
+        //save in public folder  example-app/storage/app/public F:\WORK\sail-1.14.9\sail-1.14.9\example-app\storage\app\public
+        Storage::disk('public')->put( $fileNameToSave, json_encode($data));
+        //SALVATAGGIO IN CACHE per la prima volta che si salva i dati
+        $saveJSONData = Cache::get('JSONFile'.$fileNameToSave);  //JSONFileIndexEEdataFullCached
+        if (!isset($saveJSONData)) { //saveJSONFileIndexEEdataFullCached
+            Cache::forever('JSONFile'.$fileNameToSave, json_encode($data));
+        }
+
+        echo json_encode(array('success'=>'true'));
+    }
+
+    /*** Restituisce la collezione markersArray solo se questa è stata già cachata
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function loadJSONIndexEEdataFullCached() //(Request $request)
+    {   //JSONFileIndexEEdataFullCached
+        //$fileNameToSave = $request->query->keys()[0] . ".json"; //passando queryString parametro
+        $JSONFileIndexEEdataFullCached = Cache::get('JSONFileIndexEEdataFullCached');
+        if (isset($JSONFileIndexEEdataFullCached)) {
+            Log::info("DATA loadJSONIndexEEdataFullCached: CONTENT IS CACHED" );
+            return response()->json( json_decode($JSONFileIndexEEdataFullCached));
+        }
+        else
+        {
+            Log::info("DATA loadJSONIndexEEdataFullCached: LOADING FROM DISK" );
+            $jsonData = Storage::disk('public')->get('IndexEEdataFullCached.json');
+            $jsonData = json_decode($jsonData, true);
+            //Caching first
+            Log::info("DATA loadJSONIndexEEdataFullCached: CACHING NOW" );
+            Cache::forever('JSONFileIndexEEdataFullCached', json_encode($jsonData));
+            return response()->json($jsonData);
+        }
+    }
+
+
+    /*** Restituisce la collezione markersArray solo se questa è stata già cachata
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function loadJSONIndexEEdataFullCachedZIP() //(Request $request)
+    {
+        $JSONFileIndexEEdataFullCached = Cache::get('JSONFileIndexEEdataFullCached');
+        if (isset($JSONFileIndexEEdataFullCached)) {
+            Log::info("DATA loadJSONIndexEEdataFullCached: CONTENT IS CACHED" );
+            //header('Content-Encoding: gzip'); //nn serve sembra lo applica il middleware
+            return response()->json( json_decode($JSONFileIndexEEdataFullCached));
+        }
+        else
+        {
+            Log::info("DATA loadJSONIndexEEdataFullCached: LOADING FROM DISK" );
+            $jsonData = Storage::disk('public')->get('IndexEEdataFullCached.json');
+            $jsonData = json_decode($jsonData, true);
+            //Caching first
+            Log::info("DATA loadJSONIndexEEdataFullCached: CACHING NOW" );
+            Cache::forever('JSONFileIndexEEdataFullCached', json_encode($jsonData));
+            //header('Content-Encoding: gzip'); //nn serve sembra lo applica il middleware
+            return response()->json($jsonData);
+        }
     }
 
     /**

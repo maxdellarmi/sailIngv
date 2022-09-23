@@ -11,7 +11,7 @@ var Manajax = function(xmlService){
 
 	var mySelf = this;
 
-	
+
 	var ajaxObj;
 
 	var URL = new Array();
@@ -57,12 +57,12 @@ var Manajax = function(xmlService){
 		ajaxObj.onreadystatechange = function(){
 			if(4 == ajaxObj.readyState){
 				if(200 == ajaxObj.status){
+                    console.log("200 from "+mySelf.URLString);
 					mySelf.callBackFunc(
-						('text' == mySelf.responseType || 'html' == mySelf.responseType) 
+						('text' == mySelf.responseType || 'html' == mySelf.responseType)
 							? ajaxObj.responseText
 							: ajaxObj.responseText);
-
-					//alert(mySelf.URLString); //EEList.xml?output=xml e EEList_MED.xml?output=xml
+                    console.log("end callback:" +  mySelf.callBackFunc.toString() ); //EEList.xml?output=xml e EEList_MED.xml?output=xml
 
 					//potrebbe non essere presente.
 					if (document.getElementById("access")!== undefined && document.getElementById("access")!==  null ) {
@@ -151,7 +151,7 @@ var Manajax = function(xmlService){
 							|| elemType == "HIDDEN")
 						GetElemValue(elemName, element.value);
 					else if (elemType == "CHECKBOX" && element.checked)
-						GetElemValue(elemName, 
+						GetElemValue(elemName,
 								element.value ? element.value : "On");
 					else if (elemType == "RADIO" && element.checked)
 						GetElemValue(elemName, element.value);

@@ -106,12 +106,11 @@ var CircleScale4 = 8;
 var PQanchor1 = 7;
 var PQanchor2 = 5;
 
-
 //----------------- EE classification from external file
 
 //$.get('EE_classif.txt', function(data){
-//http://localhost/OtherFilesService/listapdfR.txt
-$.get('/OtherFilesService/listapdfR.txt', function(data){
+//http://localhost/OtherFilesService/EE_classif.txt
+$.get('/OtherFilesService/EE_classif.txt', function(data){
 	EEclass = data.split('\n');
 	for (var i = 0; i < EEclass.length; i++) {
 		line = EEclass[i].split(/\t/)

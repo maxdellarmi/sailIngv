@@ -54,15 +54,29 @@ Route::get('/cfti5CS', function () {
 Route::post('/test','PhotoController@save1Json');
 
 /**************TODO:GESTIONE TERREMOTI BEGIN ************************/
-Route::get('/loadQuakesDataFromCache','PhotoController@loadQuakesDataFromCache');
 Route::post('/saveQuakesData','PhotoController@saveQuakesData');
+Route::post('/saveJSONFile', 'PhotoController@saveJSONFile'); //salva json su file  http://localhost/saveJSONFile?Filename
 Route::post('/saveQuakesGeoJSONData','PhotoController@saveQuakesGeoJSONData');
+
+Route::get('/loadQuakesDataFromCache','PhotoController@loadQuakesDataFromCache');
 Route::get('/loadGeoJSONDataFromCache','PhotoController@loadGeoJSONDataFromCache');
-
-Route::get('/indexQuakesXML','PhotoController@indexQuakesXML')->middleware('cache.headers:public;max_age=86400;etag'); //86400 1 gg 300 5min
+Route::get('/indexQuakesXML','PhotoController@indexQuakesXML')->middleware('cache.headers:public;max_age=31536000;etag'); //86400 1 gg 300 5min
 Route::get('/photoLoadXML','PhotoController@indexLoadXML');
+Route::get('/quake.php', 'PhotoController@singleQuakeLoading' )->middleware('cache.headers:public;max_age=31536000;etag');
 
-Route::get('/quake.php', 'PhotoController@singleQuakeLoading' )->middleware('cache.headers:public;max_age=86400;etag');
+//Route::get('/data', [
+//    'middleware' => 'gzip',
+//    'as' => 'data',
+//    'uses'=>'DataController@getData'
+//]);
+/********QUESTA CHIAMATA RESTITUISCE IL CONTENUTO GZIPPATO NEL BROWSER *->middleware('gzip') alla fine zippa il contenuto a livello 5 intermedio *********/
+//Route::get('/loadJSONIndexEEdataFullCached', 'PhotoController@loadJSONIndexEEdataFullCached' )->middleware('gzip');
+/*******QUESTA CHIAMATA RESTITUISCE IL CONTENUTO NON ZIPPATO TEXT PLAIN E CACHING LOCALE ********/
+Route::get('/loadJSONIndexEEdataFullCached', 'PhotoController@loadJSONIndexEEdataFullCached' )->middleware('cache.headers:public;max_age=31536000;etag');
+
+//CACHING + ZIPPED
+Route::get('/loadJSONIndexEEdataFullCachedZIP', 'PhotoController@loadJSONIndexEEdataFullCachedZIP' )->middleware('cache.headers:public;max_age=31536000;etag', 'gzip');
+
 
 //http://localhost/quakeSources/09698.xml => http://localhost/quakeSourcesXMLService/09698
 Route::get('/quakeSourcesXMLService/{nterrId}', function ($nterrId) {
@@ -72,15 +86,15 @@ Route::get('/quakeSourcesXMLService/{nterrId}', function ($nterrId) {
 })->middleware('cache.headers:public;max_age=3600;etag'); //86400 1 gg 300 5min;
 
 // ServiceEE = '/EEListService';   // =>'EEList.xml';
-Route::get('/EEListService', 'PhotoController@serviceEEList')->middleware('cache.headers:public;max_age=86400;etag');
+Route::get('/EEListService', 'PhotoController@serviceEEList')->middleware('cache.headers:public;max_age=31536000;etag');
 
 // ServiceEE_MED = '/EEList_MEDService';  // =>'EEList_MED.xml';
-Route::get('/EEList_MEDService', 'PhotoController@serviceEEList_MED')->middleware('cache.headers:public;max_age=86400;etag');
+Route::get('/EEList_MEDService', 'PhotoController@serviceEEList_MED')->middleware('cache.headers:public;max_age=31536000;etag');
 
 //PRIMA PAGINA ORIGINALE=>BLADE
 Route::get('/cfti5', function () {
     return view('indexCFTI5');
-})->middleware('cache.headers:public;max_age=86400;etag');
+})->middleware('cache.headers:public;max_age=31536000;etag');
 
 
 //RECUPERO DI TUTTI GLI ALTRI FILE RICHIESTI presenti nella directory home e attaccando semplicemente il file name ex.

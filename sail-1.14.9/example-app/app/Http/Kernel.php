@@ -22,6 +22,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         //\App\Http\Middleware\LogMiddleware::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        // \App\Http\Middleware\GzipMiddleware::class // COSI GZIPPAVA SEMPRE TUTTO!!!
     ];
 
     /**
@@ -44,6 +45,10 @@ class Kernel extends HttpKernel
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
+        //GESTIONE ZIP CREATO CUSTOM per ZIPPARE IL CONTENUTO
+        'zip' => [
+            \App\Http\Middleware\GzipMiddleware::class,
+        ],
     ];
 
     /**
@@ -63,6 +68,7 @@ class Kernel extends HttpKernel
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'gzip' => \App\Http\Middleware\GzipMiddleware::class, //ABILITAZIONE DEL MIDDLEWARE GZIP quando utilizzato
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
 }

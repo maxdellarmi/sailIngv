@@ -37,6 +37,10 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
+
+//            Route::middleware('zip')
+//                ->group(base_path('routes/zipped.php'));
+
         });
 /****aggiunto per i controller classici su namespace identificato senza questo non trova i controller!!****/
         $this->routes(function () {
@@ -48,6 +52,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->middleware('api')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
+
+//            Route::middleware('zip')
+//                ->namespace($this->namespace)
+//                ->group(base_path('routes/zipped.php'));
         });
 /****aggiunto per i controller classici su namespace identificato senza questo non trova i controller!!****/
 

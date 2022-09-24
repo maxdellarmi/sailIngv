@@ -9,8 +9,18 @@
     <script>
         var pippo;
         console.log("caricamento =>testing.HTML --------- per DECOMPRESSIONE FILE ZIPPATO");
+
+        /** Decompressione file zippato dell'elaborazione di base con il caricamento iniziale (completo di 2337 feature)
+         * var saveJSONIndexEE={
+         *      "MquakesTitleLOC":  [ ],
+         *      "MquakesEELOC": [ ],
+         *      "MquakesEEcommLOC":  [ ],
+         *      "ME1commIT": [ ],
+         *      "ME1commEN": [ ]
+         *  };
+         */
         $.ajax({
-            url:  '/loadJSONIndexEEdataFullCachedZIP',
+            url:  '/loadJSONIndexEEdataFullCachedZIP', //Route::get('/loadJSONIndexEEdataFullCachedZIP', 'PhotoController@loadJSONIndexEEdataFullCachedZIP' )->middleware('cache.headers:public;max_age=31536000;etag', 'gzip');
             type: 'GET',
             encoding: null,
             success: function(data){
